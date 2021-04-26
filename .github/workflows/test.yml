@@ -38,19 +38,6 @@ jobs:
         directory: jd_scripts
         github_token: ${{ secrets.PAT }}
         branch: jd_scripts
-        name: Sync To Gitee
-        
-on: page_build
-jobs:
-   sync:
-        runs-on: ubuntu-latest
-        steps:
-         - uses: wearerequired/git-mirror-action@master
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.GITEE_PRIVATE_KEY }}
-        with:
-          source-repo: "git@github.com:335200592/test.git"
-          destination-repo: "git@gitee.com:3351200592/test.git"
 
     - name: Delete Workflow Runs
       uses: Mattraks/delete-workflow-runs@main
