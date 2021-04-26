@@ -39,6 +39,7 @@ jobs:
         github_token: ${{ secrets.PAT }}
         branch: jd_scripts
         name: Sync To Gitee
+        
 on: page_build
 jobs:
    sync:
