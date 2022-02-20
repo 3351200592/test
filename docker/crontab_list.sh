@@ -17,15 +17,6 @@
 # 通天塔签到共建
 0 0,2 * * * node /scripts/jd_babel_sign.js >> /scripts/logs/jd_babel_sign.log 2>&1
 
-# 头文字J 助力
-11 3,13 * * * node /scripts/jd_mpdzcar_help.js >> /scripts/logs/jd_mpdzcar_help.log 2>&1
-
-# 头文字J 游戏
-3 1,10,16 * * * node /scripts/jd_mpdzcar_game.js >> /scripts/logs/jd_mpdzcar_game.log 2>&1
-
-# 头文子J
-7 0,9 * * * node /scripts/jd_mpdzcar.js >> /scripts/logs/jd_mpdzcar.log 2>&1
-
 # 京东特价 翻翻乐
 32 0,6-23 * * * node /scripts/jd_jdtj_winner.js >> /scripts/logs/jd_jdtj_winner.log 2>&1
 
