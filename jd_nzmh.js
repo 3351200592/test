@@ -152,7 +152,7 @@ function doTask(taskId) {
         } else {
           data = data.match(/query\((.*)\n/) && data.match(/query\((.*)\n/)[1] || ''
           data = JSON.parse(data)
-          if (data && data.data != "undefined") {
+          if (data && data.data) {
             if (data.data.complete_task_list.includes(taskId)) {
               console.log(`任务完成成功，当前幸运值${data.data.curbless}`)
               $.userInfo.bless = data.data.curbless
