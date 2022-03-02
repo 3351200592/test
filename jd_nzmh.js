@@ -150,7 +150,7 @@ function doTask(taskId) {
           console.log(`${err},${jsonParse(resp.body)['message']}`)
           console.log(`${$.name} API请求失败，请检查网路重试`)
         } else {
-          let data = JSON.stringify(data).match(/query\((.*)\n/) && JSON.stringify(data).match(/query\((.*)\n/)[1] || ''
+          data = data.match(/query\((.*)\n/) && data.match(/query\((.*)\n/)[1] || ''
           data = JSON.parse(data)
           if (data && data.data != "undefined") {
             if (data.data.complete_task_list.includes(taskId)) {
