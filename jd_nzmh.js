@@ -150,11 +150,14 @@ function doTask(taskId) {
           console.log(`${err},${jsonParse(resp.body)['message']}`)
           console.log(`${$.name} API请求失败，请检查网路重试`)
         } else {
-          data = JSON.parse(data.match(/query\((.*)\n/)[1])
-          if (data.data.complete_task_list.includes(taskId)) {
-            console.log(`任务完成成功，当前幸运值${data.data.curbless}`)
-            $.userInfo.bless = data.data.curbless
-          }
+          let data = data.match(/query\((.*)\n/) && data.match(/query\((.*)\n/)[1] || ''
+          data = JSON.parse(data)
+          if (data && data.data != "undefined") {
+            if (data.data.complete_task_list.includes(taskId)) {
+              console.log(`任务完成成功，当前幸运值${data.data.curbless}`)
+              $.userInfo.bless = data.data.curbless
+            }
+          } else console.log(`任务id无效 . . .`)
         }
       } catch (e) {
         $.logErr(e, resp)
