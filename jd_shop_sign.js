@@ -201,6 +201,7 @@ function getvenderName(venderId) {
           //console.log(data)
           data = JSON.parse(data)
           shopName = data.shopName
+          shopName = shopName.replace(/&#39;/g, "\'")
           //shopName = data.shopName.replace("&","")
           console.log(`【`+shopName+`】`)
           message +=`【`+shopName+`】`
