@@ -99,17 +99,23 @@ if ($.isNode()) {
                 }
                 getUA()
                 if (!$.venderId) await getvenderId($.thistoken)
-                if ($.outFlag) break
+                if ($.outFlag) {
+                    if (!$.thismsg) $.thismsg = `${message}`
+                    break
+                }
                 if (!$.venderId) continue
                 if (!$.shopName) {
                     $.theshopurl = `https://shop.m.jd.com/?venderId=${$.venderId}`
                     await getshopname($.theshopurl)
                 }
                 if (!$.shopName) await getvenderName($.venderId)
-                if (!$.getInfo) await getActivityInfo($.thistoken, $.venderId)
+                if (!$.getInfo && i < 2) await getActivityInfo($.thistoken, $.venderId)
                 if ($.outFlag) break
                 await signCollectGift($.thistoken, $.venderId, $.activityId)
-                if ($.outFlag) break
+                if ($.outFlag) {
+                    if (!$.thismsg) $.thismsg = `${message}`
+                    break
+                }
                 await taskUrl($.thistoken, $.venderId)
             }
             if (!$.thismsg) $.thismsg = `${message}`
