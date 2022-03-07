@@ -99,8 +99,8 @@ if ($.isNode()) {
                 }
                 getUA()
                 if (!$.venderId) await getvenderId($.thistoken)
-                if (!$.venderId) continue
                 if ($.outFlag) break
+                if (!$.venderId) continue
                 if (!$.shopName) {
                     $.theshopurl = `https://shop.m.jd.com/?venderId=${$.venderId}`
                     await getshopname($.theshopurl)
