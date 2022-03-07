@@ -301,7 +301,9 @@ function signCollectGift(token, venderId, activitytemp) {
                             console.log(`执行店铺签到2: ${successmsg[1]}`)
                         }
                     } else {
-                        console.log(`执行店铺签到3: ${JSON.stringify(data)}`)
+                        let islimit = JSON.stringify(data).match(/(is over invoke limit)/) && JSON.stringify(data).match(/(is over invoke limit)/)[1] || ''
+                        if (islimit) console.log(`❗️执行店铺签到: 超出调用限制 ‼️‼️`)
+                        else console.log(`执行店铺签到3: ${JSON.stringify(data)}`)
                     }
                 }
             } catch (e) {
