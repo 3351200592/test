@@ -151,8 +151,7 @@ function getvenderId(token) {
                     data = JSON.parse(/{(.*)}/g.exec(data)[0])
                     if (data.code == 402) {
                         $.venderId = ''
-                        if (num == 1) console.log(`第${num}个店铺签到活动已失效`)
-                        else console.log(`\n第${num}个店铺签到活动已失效`)
+                        console.log(`第${num}个店铺签到活动已失效`)
                         message += `签到活动已失效\n\n`
                         $.outFlag = true
                     } else {
