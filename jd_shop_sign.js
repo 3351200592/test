@@ -109,7 +109,7 @@ if ($.isNode()) {
                     await getshopname($.theshopurl)
                 }
                 if (!$.shopName) await getvenderName($.venderId)
-                if (!$.getInfo && i < 2) await getActivityInfo($.thistoken, $.venderId)
+                if (!$.activityId) await getActivityInfo($.thistoken, $.venderId)
                 if ($.outFlag) break
                 await signCollectGift($.thistoken, $.venderId, $.activityId)
                 if ($.outFlag) {
