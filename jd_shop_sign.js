@@ -84,6 +84,7 @@ if ($.isNode()) {
         $.thismsg = "";
         if (!$.thistoken) continue
         console.log(`\n\n======================= 开始第${num}个店铺签到 =======================`);
+        console.log(`token: ${$.thistoken}`);
         for (let i = 0; i < cookiesArr.length; i++) {
             if (cookiesArr[i]) {
                 cookie = cookiesArr[i];
