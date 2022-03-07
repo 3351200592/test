@@ -166,13 +166,13 @@ async function showMsg() {
     ReturnMessage += `签到现金：${$.TotalMoney}元\n`;
   }
   if (typeof $.JDtotalcash !== "undefined") {
-    ReturnMessage += `极速金币：${$.JDtotalcash}金币(≈${$.JDtotalcash / 10000}元)\n`;
+    ReturnMessage += `极速金币：${$.JDtotalcash}金币(≈${($.JDtotalcash / 10000).toFixed(2)}元)\n`;
   }
   if (typeof $.JdzzNum !== "undefined") {
-    ReturnMessage += `京东赚赚：${$.JdzzNum}金币(≈${$.JdzzNum / 10000}元)\n`;
+    ReturnMessage += `京东赚赚：${$.JdzzNum}金币(≈${($.JdzzNum / 10000).toFixed(2)}元)\n`;
   }
   if ($.JdMsScore != 0) {
-    ReturnMessage += `京东秒杀：${$.JdMsScore}秒秒币(≈${$.JdMsScore / 1000}元)\n`;
+    ReturnMessage += `京东秒杀：${$.JdMsScore}秒秒币(≈${($.JdMsScore / 1000).toFixed(2)}元)\n`;
   }
   if ($.JdFarmProdName != "") {
     if ($.JdtreeEnergy != 0) {
