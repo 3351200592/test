@@ -145,7 +145,7 @@ async function siteppM_skuOnceApply() {
               await siteppM_appliedSuccAmount()
             } else {
               console.log(`保价失败：${data.responseMessage}`)
-              message += `保价失败：${data.responseMessage}\n`
+              if (data.responseMessage && data.responseMessage.indexOf("不要频繁点我") == -1) message += `保价失败：${data.responseMessage}\n`
             }
           }
         }
