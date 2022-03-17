@@ -155,7 +155,7 @@ async function getInteractionInfo(type = true) {
 }
 function queryPanamaFloor() {
     return new Promise((resolve) => {
-        $.post(taskPostUrl("qryCompositeMaterials", {"geo":null,"mcChannel":0,"activityId":"01174675","pageId":"3455491","qryParam":"[{\"type\":\"advertGroup\",\"id\":\"06167705\",\"mapTo\":\"advData\",\"next\":[{\"type\":\"productGroup\",\"mapKey\":\"comment[0]\",\"mapTo\":\"productGroup\",\"attributes\":13},{\"type\":\"productGroup\",\"mapKey\":\"comment[1]\",\"mapTo\":\"productGroup2\",\"attributes\":13}]}]","applyKey":"21new_products_h"}), (err, resp, data) => {
+        $.post(taskPostUrl("qryCompositeMaterials", { "geo": null, "mcChannel": 0, "activityId": "01174675", "pageId": "3455491", "qryParam": "[{\"type\":\"advertGroup\",\"id\":\"06167705\",\"mapTo\":\"advData\",\"next\":[{\"type\":\"productGroup\",\"mapKey\":\"comment[0]\",\"mapTo\":\"productGroup\",\"attributes\":13},{\"type\":\"productGroup\",\"mapKey\":\"comment[1]\",\"mapTo\":\"productGroup2\",\"attributes\":13}]}]", "applyKey": "21new_products_h" }), (err, resp, data) => {
             try {
                 if (err) {
                     console.log(`${JSON.stringify(err)}`)
@@ -382,9 +382,9 @@ function getSign(functionid, body, uuid) {
 function TotalBean() {
     return new Promise(async resolve => {
         const options = {
-            url: "https://wq.jd.com/user_new/info/GetJDUserInfoUnion?sceneval=2",
+            url: "https://me-api.jd.com/user_new/info/GetJDUserInfoUnion",
             headers: {
-                Host: "wq.jd.com",
+                Host: "me-api.jd.com",
                 Accept: "*/*",
                 Connection: "keep-alive",
                 Cookie: cookie,
@@ -401,15 +401,15 @@ function TotalBean() {
                 } else {
                     if (data) {
                         data = JSON.parse(data);
-                        if (data['retcode'] === 1001) {
+                        if (data['retcode'] === "1001") {
                             $.isLogin = false; //cookie过期
                             return;
                         }
-                        if (data['retcode'] === 0 && data.data && data.data.hasOwnProperty("userInfo")) {
+                        if (data['retcode'] === "0" && data.data && data.data.hasOwnProperty("userInfo")) {
                             $.nickName = data.data.userInfo.baseInfo.nickname;
                         }
                     } else {
-                        console.log('京东服务器返回空数据');
+                        $.log('京东服务器返回空数据');
                     }
                 }
             } catch (e) {
