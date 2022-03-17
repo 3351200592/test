@@ -759,8 +759,8 @@ async function getjdfruit() {
       try {
         if (err) {
           console.log('\n东东农场: API查询请求失败 ‼️‼️');
-          console.log(JSON.stringify(err));
-          $.logErr(err);
+          // console.log(JSON.stringify(err));
+          // $.logErr(err);
         } else {
           if (safeGet(data)) {
             $.farmInfo = JSON.parse(data)
