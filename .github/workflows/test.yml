@@ -31,13 +31,13 @@ jobs:
         ssh-keyscan gitee.com > ~/.ssh/known_hosts
     - name: Clone master
       run: |
-        git clone -b main git@github.com:Annyoo2021/scripts master
+        git clone -b main git@github.com:Annyoo2021/scripts jd_scripts
     - name: Push master
       uses: ad-m/github-push-action@master
       with:
-        directory: master
+        directory: jd_scripts
         github_token: ${{ secrets.PAT }}
-        branch: master
+        branch: jd_scripts
 
     - name: Delete Workflow Runs
       uses: Mattraks/delete-workflow-runs@main
