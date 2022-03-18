@@ -31,7 +31,7 @@ jobs:
         ssh-keyscan gitee.com > ~/.ssh/known_hosts
     - name: Clone master
       run: |
-        git clone -b main git@github.com:Annyoo2021/scripts
+        git clone -b main git@github.com:Annyoo2021/scripts master
     - name: Push master
       uses: ad-m/github-push-action@master
       with:
