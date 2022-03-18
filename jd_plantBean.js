@@ -258,34 +258,40 @@ async function doTask() {
                 const { data } = $.shopTaskListRes;
                 let goodShopListARR = [], moreShopListARR = [], shopList = [];
                 const { goodShopList, moreShopList } = data;
-                for (let i of goodShopList) {
-                    if (i.taskState === '2') {
-                        goodShopListARR.push(i);
+                if (goodShopList && goodShopList.length > 0) {
+                    for (let i of goodShopList) {
+                        if (i.taskState === '2') {
+                            goodShopListARR.push(i);
+                        }
                     }
                 }
-                for (let j of moreShopList) {
-                    if (j.taskState === '2') {
-                        moreShopListARR.push(j);
+                if (moreShopList && moreShopList.length > 0) {
+                    for (let j of moreShopList) {
+                        if (j.taskState === '2') {
+                            moreShopListARR.push(j);
+                        }
                     }
                 }
                 shopList = goodShopListARR.concat(moreShopListARR);
-                for (let shop of shopList) {
-                    const { shopId, shopTaskId } = shop;
-                    const body = {
-                        "monitor_refer": "plant_shopNutrientsTask",
-                        "shopId": shopId,
-                        "shopTaskId": shopTaskId
-                    }
-                    const shopRes = await requestGet('shopNutrientsTask', body);
-                    console.log(`shopRes结果:${JSON.stringify(shopRes)}`);
-                    if (shopRes && shopRes.code === '0') {
-                        if (shopRes.data && shopRes.data.nutrState && shopRes.data.nutrState === '1') {
-                            unFinishedShopNum--;
+                if (shopList && shopList.length > 0) {
+                    for (let shop of shopList) {
+                        const { shopId, shopTaskId } = shop;
+                        const body = {
+                            "monitor_refer": "plant_shopNutrientsTask",
+                            "shopId": shopId,
+                            "shopTaskId": shopTaskId
                         }
-                    }
-                    if (unFinishedShopNum <= 0) {
-                        console.log(`${item.taskName}任务已做完\n`)
-                        break;
+                        const shopRes = await requestGet('shopNutrientsTask', body);
+                        console.log(`shopRes结果:${JSON.stringify(shopRes)}`);
+                        if (shopRes && shopRes.code === '0') {
+                            if (shopRes.data && shopRes.data.nutrState && shopRes.data.nutrState === '1') {
+                                unFinishedShopNum--;
+                            }
+                        }
+                        if (unFinishedShopNum <= 0) {
+                            console.log(`${item.taskName}任务已做完\n`)
+                            break;
+                        }
                     }
                 }
             }
