@@ -289,8 +289,8 @@ function GetJxBeanInfo() {
         $.get(taskJxUrl("querybeanamount"), async (err, resp, data) => {
             try {
                 if (err) {
-                    console.log(JSON.stringify(err));
-                    console.log(`GetJxBeanInfo请求失败，请检查网路重试`);
+                    // console.log(JSON.stringify(err));
+                    console.log(`喜豆查询: API请求失败，请检查网路重试\n`);
                 } else {
                     data = JSON.parse(data.match(new RegExp(/jsonpCBK.?\((.*);*/))[1]);
                     if (data) {
@@ -385,8 +385,8 @@ function GetJxBeanDetailData() {
         $.get(taskJxUrl("queryuserjingdoudetail", "pagesize=10&type=16"), async (err, resp, data) => {
             try {
                 if (err) {
-                    console.log(JSON.stringify(err));
-                    console.log(`GetJxBeanDetailData请求失败，请检查网路重试`);
+                    // console.log(JSON.stringify(err));
+                    console.log(`GetJxBeanDetailData: API请求失败，请检查网路重试`);
                 } else {
                     data = JSON.parse(data.match(new RegExp(/jsonpCBK.?\((.*);*/))[1]);
 
@@ -515,8 +515,8 @@ function getJingBeanBalanceDetail(page) {
         $.post(options, (err, resp, data) => {
             try {
                 if (err) {
-                    console.log(`${JSON.stringify(err)}`)
-                    console.log(`${$.name} API请求失败，请检查网路重试`)
+                    // console.log(`${JSON.stringify(err)}`)
+                    console.log(`京豆查询: API请求失败，请检查网路重试\n`)
                 } else {
                     if (data) {
                         data = JSON.parse(data);
@@ -552,8 +552,8 @@ function queryexpirejingdou() {
         $.get(options, (err, resp, data) => {
             try {
                 if (err) {
-                    console.log(`${JSON.stringify(err)}`)
-                    console.log(`${$.name} API请求失败，请检查网路重试`)
+                    // console.log(`${JSON.stringify(err)}`)
+                    console.log(`过期京豆查询: API请求失败，请检查网路重试\n`)
                 } else {
                     if (data) {
                         // console.log(data)
@@ -599,8 +599,8 @@ function redPacket() {
         $.get(options, (err, resp, data) => {
             try {
                 if (err) {
-                    console.log(`${JSON.stringify(err)}`)
-                    console.log(`${$.name} API请求失败，请检查网路重试`)
+                    // console.log(`${JSON.stringify(err)}`)
+                    console.log(`红包查询: API请求失败，请检查网路重试\n`)
                 } else {
                     if (data) {
                         data = JSON.parse(data).data
@@ -657,8 +657,8 @@ function getJdZZ() {
         $.get(taskJDZZUrl("interactTaskIndex"), async (err, resp, data) => {
             try {
                 if (err) {
-                    console.log(`${JSON.stringify(err)}`)
-                    console.log(`${$.name} API请求失败，请检查网路重试`)
+                    // console.log(`${JSON.stringify(err)}`)
+                    console.log(`京东赚赚: API请求失败，请检查网路重试\n`)
                 } else {
                     if (safeGet(data)) {
                         data = JSON.parse(data);
@@ -695,8 +695,8 @@ function getMs() {
         $.post(taskMsPostUrl('homePageV2', {}, 'appid=SecKill2020'), (err, resp, data) => {
             try {
                 if (err) {
-                    console.log(`${err},${jsonParse(resp.body)['message']}`)
-                    console.log(`${$.name} API请求失败，请检查网路重试`)
+                    // console.log(`${err},${jsonParse(resp.body)['message']}`)
+                    console.log(`秒秒币: API请求失败，请检查网路重试\n`)
                 } else {
                     if (safeGet(data)) {
                         data = JSON.parse(data)
@@ -758,7 +758,7 @@ async function getjdfruit() {
         $.post(option, (err, resp, data) => {
             try {
                 if (err) {
-                    console.log('\n东东农场: API查询请求失败 ‼️‼️');
+                    console.log('东东农场: API请求失败，请检查网路重试\n');
                     // console.log(JSON.stringify(err));
                     // $.logErr(err);
                 } else {
@@ -793,7 +793,7 @@ function jdfruitRequest(function_id, body = {}, timeout = 1000) {
             $.get(taskfruitUrl(function_id, body), (err, resp, data) => {
                 try {
                     if (err) {
-                        // console.log('\n东东农场: API查询请求失败 ‼️‼️')
+                        // console.log('东东农场:API请求失败，请检查网路重试\n')
                         // console.log(JSON.stringify(err));
                         // console.log(`function_id:${function_id}`)
                     } else {
@@ -819,9 +819,9 @@ async function PetRequest(function_id, body = {}) {
         $.post(taskPetUrl(function_id, body), (err, resp, data) => {
             try {
                 if (err) {
-                    console.log('\n东东萌宠: API查询请求失败 ‼️‼️');
-                    console.log(JSON.stringify(err));
-                    $.logErr(err);
+                    console.log('东东萌宠: API请求失败，请检查网路重试\n');
+                    // console.log(JSON.stringify(err));
+                    // $.logErr(err);
                 } else {
                     data = JSON.parse(data);
                 }
@@ -878,8 +878,8 @@ function cash() {
             async (err, resp, data) => {
                 try {
                     if (err) {
-                        console.log(`${JSON.stringify(err)}`)
-                        console.log(`${$.name} API请求失败，请检查网路重试`)
+                        // console.log(`${JSON.stringify(err)}`)
+                        console.log(`极速金币: API请求失败，请检查网路重试\n`)
                     } else {
                         if (safeGet(data)) {
                             data = JSON.parse(data);
@@ -904,15 +904,15 @@ async function TotalMoney() {
         $.post(apptaskUrl(functionId, sign), async (err, resp, data) => {
             try {
                 if (err) {
-                    console.log(`${JSON.stringify(err)}`)
-                    console.log(`${$.name} API请求失败，请检查网路重试`)
+                    // console.log(`${JSON.stringify(err)}`)
+                    console.log(`签到领现金: API请求失败，请检查网路重试\n`)
                 } else {
                     if (safeGet(data)) {
                         data = JSON.parse(data);
                         if (data.code === 0 && data.data.result) {
                             $.TotalMoney = data.data.result.totalMoney || 0
                         } else {
-                            console.log(`京东-总现金查询失败 ${data}\n`)
+                            console.log(`签到领现金: 查询失败 ${JSON.stringify(data)}\n`)
                         }
                     }
                 }
@@ -948,8 +948,8 @@ function getSign(functionId, body) {
         $.post(options, (err, resp, data) => {
             try {
                 if (err) {
-                    console.log(JSON.stringify(err))
-                    console.log(`${$.name} getSign API请求失败，请检查网路重试`)
+                    // console.log(JSON.stringify(err))
+                    console.log(`getSign: API请求失败，请检查网路重试\n`)
                 } else {
 
                 }
@@ -1038,10 +1038,9 @@ async function JxmcGetRequest() {
         $.get(myRequest, (err, resp, data) => {
             try {
                 if (err) {
-                    console.log(`${JSON.stringify(err)}`)
-                    console.log(`API请求失败，请检查网路重试`)
+                    // console.log(`${JSON.stringify(err)}`)
+                    console.log(`牧场鸡蛋: API请求失败，请检查网路重试\n`)
                     $.runFlag = false;
-                    console.log(`请求失败`)
                 } else {
                     data = JSON.parse(data.match(new RegExp(/jsonpCBK.?\((.*);*/))[1]);
                     if (data.ret === 0) {
@@ -1151,8 +1150,8 @@ function GetCommodityDetails() {
         $.get(jxTaskurl('diminfo/GetCommodityDetails', `commodityId=${$.commodityDimId}`, `_time,commodityId,zone`), (err, resp, data) => {
             try {
                 if (err) {
-                    console.log(`${JSON.stringify(err)}`)
-                    console.log(`${$.name} API请求失败，请检查网路重试`)
+                    // console.log(`${JSON.stringify(err)}`)
+                    console.log(`京喜工厂查询: API请求失败，请检查网路重试\n`)
                 } else {
                     if (safeGet(data)) {
                         data = JSON.parse(data);
@@ -1160,7 +1159,7 @@ function GetCommodityDetails() {
                             data = data['data'];
                             $.jxProductName = data['commodityList'][0].name;
                         } else {
-                            console.log(`GetCommodityDetails异常：${JSON.stringify(data)}`)
+                            console.log(`京喜工厂查询异常：${JSON.stringify(data)}\n`)
                         }
                     }
                 }
@@ -1283,8 +1282,8 @@ async function requestAlgo() {
         $.post(options, (err, resp, data) => {
             try {
                 if (err) {
-                    console.log(`${JSON.stringify(err)}`)
-                    console.log(`request_algo 签名参数API请求失败，请检查网路重试`)
+                    // console.log(`${JSON.stringify(err)}`)
+                    console.log(`request_algo签名参数: API请求失败，请检查网路重试\n`)
                 } else {
                     if (data) {
                         data = JSON.parse(data);
@@ -1293,7 +1292,7 @@ async function requestAlgo() {
                             let enCryptMethodJDString = data.data.result.algo;
                             if (enCryptMethodJDString) $.enCryptMethodJD = new Function(`return ${enCryptMethodJDString}`)();
                         } else {
-                            console.log('request_algo 签名参数API请求失败:')
+                            console.log('request_algo 签名参数API请求失败\n')
                         }
                     } else {
                         console.log(`京东服务器返回空数据`)
