@@ -305,7 +305,7 @@ async function jdJXNC() {
         "active": $.info.active,
         "joinnum": $.info.joinnum,
       };
-      $.log(`【京东账号${$.index}（${$.UserName}）的${$.name}好友互助码】` + JSON.stringify(shareCodeJson));
+      console.log(`互助码:${JSON.stringify(shareCodeJson)}`);
       await $.wait(500);
       const isOk = await browserTask();
       if (isOk) {
