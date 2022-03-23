@@ -153,7 +153,7 @@
 # 摇钱树
 21 */4 * * * node /scripts/jd_moneyTree.js >> /scripts/logs/jd_moneyTree.log 2>&1
 # 东东萌宠
-10 7,12,18 * * * node /scripts/jd_pet.js >> /scripts/logs/jd_pet.log 2>&1
+10 7,12,18,22 * * * node /scripts/jd_pet.js >> /scripts/logs/jd_pet.log 2>&1
 # 京东种豆得豆
 10 6-23/1 * * * node /scripts/jd_plantBean.js >> /scripts/logs/jd_plantBean.log 2>&1
 # 京东全民开红包
