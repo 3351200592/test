@@ -176,14 +176,14 @@ async function showMsg() {
     }
     if ($.JdFarmProdName != "") {
         if ($.JdtreeEnergy != 0) {
-            ReturnMessage += `东东农场：${$.JdFarmProdName},${(($.JdtreeEnergy / $.JdtreeTotalEnergy) * 100).toFixed(2)}%`;
+            ReturnMessage += `东东农场：${$.JdFarmProdName.replace(/(^\s*)|(\s*$)/g, "")},${(($.JdtreeEnergy / $.JdtreeTotalEnergy) * 100).toFixed(2)}%`;
             if ($.JdwaterD != 'Infinity' && $.JdwaterD != '-Infinity') {
                 ReturnMessage += `,${$.JdwaterD === 1 ? '明天' : $.JdwaterD === 2 ? '后天' : $.JdwaterD + '天后'}可兑\n`;
             } else {
                 ReturnMessage += `\n`;
             }
         } else {
-            ReturnMessage += `东东农场：${$.JdFarmProdName}\n`;
+            ReturnMessage += `东东农场：${$.JdFarmProdName.replace(/(^\s*)|(\s*$)/g, "")}\n`;
         }
     }
 
@@ -192,14 +192,14 @@ async function showMsg() {
     if (initPetTownRes.code === '0' && initPetTownRes.resultCode === '0' && initPetTownRes.message === 'success') {
         $.petInfo = initPetTownRes.result;
         if (response.resultCode === '0') {
-            ReturnMessage += `东东萌宠：${$.petInfo.goodsInfo.goodsName},`;
+            ReturnMessage += `东东萌宠：${$.petInfo.goodsInfo.goodsName.replace(/(^\s*)|(\s*$)/g, "")},`;
             ReturnMessage += `${response.result.medalNum}/${response.result.medalNum + response.result.needCollectMedalNum}块,${((response.result.medalPercent / 100 + response.result.medalNum) / (response.result.medalNum + response.result.needCollectMedalNum) * 100).toFixed(2)}%\n`;
             //ReturnMessage += `          已有${response.result.medalNum}块勋章，还需${response.result.needCollectMedalNum}块\n`;
         }
     }
 
     if ($.jxFactoryInfo) {
-        ReturnMessage += `京喜工厂：${$.jxFactoryInfo}\n`
+        ReturnMessage += `京喜工厂：${$.jxFactoryInfo.replace(/(^\s*)|(\s*$)/g, "")}\n`
     }
 
     ReturnMessage += `🧧🧧🧧🧧红包明细🧧🧧🧧🧧`;
