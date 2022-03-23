@@ -1,10 +1,6 @@
 /*
 种豆得豆
-更新时间：2021-04-9
 活动入口：京东APP我的-更多工具-种豆得豆
-已支持IOS京东多账号,云端多京东账号
-脚本兼容: QuantumultX, Surge, Loon, JSBox, Node.js
-注：会自动关注任务中的店铺跟商品，介意者勿使用。
 互助码shareCode请先手动运行脚本查看打印可看到
 每个京东账号每天只能帮助3个人。多出的助力码将会助力失败。
 1 7-21/2 * * * jd_plantBean.js, tag=种豆得豆
@@ -131,7 +127,7 @@ async function doGetReward() {
         //收获
         await getReward();
         console.log('开始领取京豆');
-        if ($.getReward && $.getReward.code === '0') {
+        if ($.getReward && $.getReward.data && $.getReward.code === '0') {
             console.log('京豆领取成功');
             message += `【上期兑换京豆】${$.getReward.data.awardBean}个\n`;
             $.msg($.name, subTitle, message);
@@ -155,7 +151,7 @@ async function doGetReward() {
 
 async function doCultureBean() {
     await plantBeanIndex();
-    if ($.plantBeanIndexResult && $.plantBeanIndexResult.code === '0') {
+    if ($.plantBeanIndexResult && $.plantBeanIndexResult.data && $.plantBeanIndexResult.code === '0') {
         const plantBeanRound = $.plantBeanIndexResult.data.roundList[num]
         if (plantBeanRound.roundState === '2') {
             //收取营养液
@@ -211,7 +207,7 @@ async function stealFriendWater() {
 
 async function doEgg() {
     await egg();
-    if ($.plantEggLotteryRes && $.plantEggLotteryRes.code === '0') {
+    if ($.plantEggLotteryRes && $.plantEggLotteryRes.data && $.plantEggLotteryRes.code === '0') {
         if ($.plantEggLotteryRes.data.restLotteryNum > 0) {
             const eggL = new Array($.plantEggLotteryRes.data.restLotteryNum).fill('');
             console.log(`目前共有${eggL.length}次扭蛋的机会`)
@@ -388,7 +384,7 @@ async function doTask() {
 function showTaskProcess() {
     return new Promise(async resolve => {
         await plantBeanIndex();
-        if ($.plantBeanIndexResult.data) $.taskList = $.plantBeanIndexResult.data.taskList;
+        if ($.plantBeanIndexResult && $.plantBeanIndexResult.data) $.taskList = $.plantBeanIndexResult.data.taskList;
         if ($.taskList && $.taskList.length > 0) {
             console.log("     任务   进度");
             for (let item of $.taskList) {
@@ -411,7 +407,7 @@ async function doHelp() {
         await helpShare(plantUuid);
         if ($.helpResult && $.helpResult.code === '0') {
             // console.log(`助力好友结果: ${JSON.stringify($.helpResult.data.helpShareRes)}`);
-            if ($.helpResult.data.helpShareRes) {
+            if ($.helpResult.data && $.helpResult.data.helpShareRes) {
                 if ($.helpResult.data.helpShareRes.state === '1') {
                     console.log(`助力好友${plantUuid}成功`)
                     console.log(`${$.helpResult.data.helpShareRes.promptText}\n`);
