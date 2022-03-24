@@ -20,16 +20,16 @@ let shareCodes = [
 // 判断环境变量里面是否有东东工厂互助码
 if (process.env.DDFACTORY_SHARECODES) {
   if (process.env.DDFACTORY_SHARECODES.indexOf('&') > -1) {
-    console.log(`您的互助码选择的是用&隔开\n`)
+    // console.log(`您的互助码选择的是用&隔开\n`)
     shareCodes = process.env.DDFACTORY_SHARECODES.split('&');
   } else if (process.env.DDFACTORY_SHARECODES.indexOf('\n') > -1) {
-    console.log(`您的互助码选择的是用换行隔开\n`)
+    // console.log(`您的互助码选择的是用换行隔开\n`)
     shareCodes = process.env.DDFACTORY_SHARECODES.split('\n');
   } else {
     shareCodes = process.env.DDFACTORY_SHARECODES.split();
   }
 } else {
-  console.log(`由于您环境变量(DDFACTORY_SHARECODES)里面未提供助力码，故此处运行将会给脚本内置的码进行助力，请知晓！`)
+  // console.log(`由于您环境变量(DDFACTORY_SHARECODES)里面未提供助力码，故此处运行将会给脚本内置的码进行助力，请知晓！`)
 }
 for (let i = 0; i < shareCodes.length; i++) {
   const index = (i + 1 === 1) ? '' : (i + 1);
