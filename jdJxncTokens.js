@@ -12,16 +12,16 @@ let JxncTokens = [
 // 判断github action里面是否有京喜农场 token 
 if (process.env.JXNCTOKENS) {
   if (process.env.JXNCTOKENS.indexOf('&') > -1) {
-    console.log(`您的京喜农场 token 选择的是用&隔开\n`)
+    // console.log(`您的京喜农场 token 选择的是用&隔开\n`)
     JxncTokens = process.env.JXNCTOKENS.split('&');
   } else if (process.env.JXNCTOKENS.indexOf('\n') > -1) {
-    console.log(`您的京喜农场 token 选择的是用换行隔开\n`)
+    // console.log(`您的京喜农场 token 选择的是用换行隔开\n`)
     JxncTokens = process.env.JXNCTOKENS.split('\n');
   } else {
     JxncTokens = process.env.JXNCTOKENS.split();
   }
 } else if (process.env.JD_COOKIE) {
-  console.log(`由于您secret里面未提供 tokens，当种植 APP 种子时，将不能正常进行任务，请提供 token 或 种植非 APP 种子！`)
+  // console.log(`由于您secret里面未提供 tokens，当种植 APP 种子时，将不能正常进行任务，请提供 token 或 种植非 APP 种子！`)
 }
 JxncTokens = [...new Set(JxncTokens.filter(item => !!item))]
 for (let i = 0; i < JxncTokens.length; i++) {
