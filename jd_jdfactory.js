@@ -325,7 +325,7 @@ async function algorithm() {
 }
 
 async function helpFriends() {
-    console.log(`格式化后的助力码::${JSON.stringify(getCodes(newShareCodes))}\n`);
+    console.log(`格式化后的助力码:${JSON.stringify(getCodes(newShareCodes))}\n`);
 
     for (let v of newShareCodes) {
         code = v[1]
