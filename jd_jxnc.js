@@ -159,10 +159,12 @@ function requireConfig() {
 
 		if ($.isNode()) {
 			Object.keys(jdJxncShareCodeNode).forEach((item) => {
-				if (jdJxncShareCodeNode[item]) {
+				let check = false
+				for (let t of jdJxncShareCodeNode[item].split("@")) if (t != "{}") { check = true ;break; }
+				if (jdJxncShareCodeNode[item] && check) {
 					jxncShareCodeArr.push(jdJxncShareCodeNode[item])
 				} else {
-					jxncShareCodeArr.push('');
+					// jxncShareCodeArr.push('');
 				}
 			})
 		}
