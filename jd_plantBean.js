@@ -1,40 +1,78 @@
 /*
 种豆得豆
 活动入口：京东APP我的-更多工具-种豆得豆
-互助码shareCode请先手动运行脚本查看打印可看到
 每个京东账号每天只能帮助3个人。多出的助力码将会助力失败。
-1 7-21/2 * * * jd_plantBean.js, tag=种豆得豆
+1 7-21/2 * * * jd_plantBean.js
+annyooo 修改
 */
 
 const $ = new Env('京东种豆得豆');
-//Node.js用户请在jdCookie.js处填写京东ck;
-//ios等软件用户直接用NobyDa的jd cookie
 let jdNotify = true;//是否开启静默运行。默认true开启
-let cookiesArr = [], cookie = '', jdPlantBeanShareArr = [], isBox = false, notify, newShareCodes, option, message, subTitle;
+let cookiesArr = [], cookie = '', notify = '', option = '', message = '', subTitle = '';
+let newShareCodes = [];
+
+const thefs = require('fs');
+
+let outpath = './PlantBean_HelpOut.json'
+$.HelpOuts = { "thisDay": new Date().getDate(), "helpOut": [], "helpFull": [] }
+$.Helptext = ""
+$.helpJson = {}
+
+if (thefs.existsSync(outpath)) $.Helptext = thefs.readFileSync(outpath, 'utf-8')
+if ($.Helptext) $.helpJson = JSON.parse($.Helptext)
+if (JSON.stringify($.helpJson) != "{}" && $.helpJson.thisDay && $.helpJson.thisDay == $.HelpOuts.thisDay) {
+    if ($.helpJson.helpOut && $.helpJson.helpOut.length) for (let n of $.helpJson.helpOut) if ($.HelpOuts.helpOut.indexOf(n) == -1) $.HelpOuts.helpOut.push(n)
+    if ($.helpJson.helpFull && $.helpJson.helpFull.length) for (let m of $.helpJson.helpFull) if ($.HelpOuts.helpFull.indexOf(m) == -1) $.HelpOuts.helpFull.push(m)
+}
+
+$.helpOut = $.HelpOuts.helpOut
+$.helpFull = $.HelpOuts.helpFull
+
+$.unLogins = []
+$.otherCodes = []
+$.myCodes = []
+$.myFronts = []
+$.helpRunout = []
+$.blackIndexs = []
+// 互助环境变量1 设定固定车头助力码、大小写逗号隔开、连续多个可直接用 - 、如：1-10，可混用如：1,2,3,7-15
+let helpFronts = $.isNode() ? (process.env.jd_helpFronts ? process.env.jd_helpFronts : []) : []
+// 互助环境变量2 除了固定互助码放前面被助力 之外的账号 设定随机还是顺序助力，true为随机，false为顺序
+let helpRandom = $.isNode() ? (process.env.jd_helpRandom ? process.env.jd_helpRandom : false) : false
+
+if (helpFronts.length > 0) {
+    helpFronts = helpFronts.replace(/，/g, ",").replace(/ /g, "").split(",")
+    for (let n in helpFronts) {
+        let v = helpFronts[n]
+        if (v.match(/\d+-\d+/g) && v.match(/\d+-\d+/g).length > 0) {
+            let a = Number(v.split("-")[0].replace(/ /g, ""))
+            let b = Number(v.split("-")[1].replace(/ /g, ""))
+            if (b > a) {
+                let arr = generateArr(a, b)
+                for (let t of arr) $.myFronts.push(t)
+            }
+        } else $.myFronts.push(Number(v))
+    }
+    $.myFronts = [...new Set($.myFronts)]
+}
+
 //京东接口地址
 const JD_API_HOST = 'https://api.m.jd.com/client.action';
-//助力好友分享码(最多3个,否则后面的助力失败)
-//此此内容是IOS用户下载脚本到本地使用，填写互助码的地方，同一京东账号的好友互助码请使用@符号隔开。
-//下面给出两个账号的填写示例（iOS只支持2个京东账号）
-let shareCodes = [ // IOS本地脚本用户这个列表填入你要助力的好友的shareCode
-    //账号一的好友shareCode,不同好友的shareCode中间用@符号隔开
-    '',
-    //账号二的好友shareCode,不同好友的shareCode中间用@符号隔开
-    '',
-]
+
 let allMessage = ``;
 let currentRoundId = null;//本期活动id
 let lastRoundId = null;//上期id
 let roundList = [];
 let awardState = '';//上期活动的京豆是否收取
-let randomCount = $.isNode() ? 0 : 5;
 let num;
+
 !(async () => {
     await requireConfig();
     if (!cookiesArr[0]) {
         $.msg($.name, '【提示】请先获取京东账号一cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/bean/signIndex.action', { "open-url": "https://bean.m.jd.com/bean/signIndex.action" });
         return;
     }
+    $.theStart = new Date().getTime()
+
     for (let i = 0; i < cookiesArr.length; i++) {
         if (cookiesArr[i]) {
             cookie = cookiesArr[i];
@@ -43,36 +81,95 @@ let num;
             $.isLogin = true;
             $.nickName = '';
             await TotalBean();
-            console.log(`\n开始【京东账号${$.index}】${$.nickName || $.UserName}\n`);
+            console.log(`\n\n\n开始【京东账号${$.index}】${$.nickName || $.UserName}\n`);
             if (!$.isLogin) {
-                $.msg($.name, `【提示】cookie已失效`, `京东账号${$.index} ${$.nickName || $.UserName}\n请重新登录获取\nhttps://bean.m.jd.com/bean/signIndex.action`, { "open-url": "https://bean.m.jd.com/bean/signIndex.action" });
+                console.log("Cookie已失效. . .")
+                $.unLogins.push($.index)
 
                 if ($.isNode()) {
                     await notify.sendNotify(`${$.name}cookie已失效 - ${$.UserName}`, `京东账号${$.index} ${$.UserName}\n请重新登录获取cookie`);
                 }
+
+                if ($.myFronts.includes($.index)) $.myFronts = $.myFronts.filter(function (item) { return item !== $.index })
+
                 continue
             }
             message = '';
             subTitle = '';
             option = {};
-            await shareCodesFormat();
             await jdPlantBean();
             await showMsg();
+            if ($.index % 5 == 0) {
+                console.log(`\n\n***************** 每5个账号休息1分钟、已用时${parseInt((new Date().getTime() - $.theStart) / 1000)}秒 *****************`)
+                await $.wait(parseInt(Math.random() * 5000 + 60000, 10))
+            }
         }
     }
+
+    console.log(`\n\n***************** 日常任务结束、已用时${parseInt((new Date().getTime() - $.theStart) / 1000)}秒 *****************`)
+
+    if ($.helpFull.length) {
+        for (let t of $.helpFull) {
+            if (checkArr($.myCodes, t) > -1) $.myCodes.splice(checkArr($.myCodes, t), 1) // 剔除助力已满的助力码
+            if (checkArr($.otherCodes, t) > -1) $.otherCodes.splice(checkArr($.otherCodes, t), 1) // 剔除助力已满的助力码
+        }
+    }
+
+    console.log(`\n\n\n======================= 开始互助 =======================`);
+    for (let i = 0; i < cookiesArr.length; i++) {
+        if (cookiesArr[i]) {
+            cookie = cookiesArr[i];
+            $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1])
+            $.index = i + 1;
+            $.nickName = '';
+            console.log(`\n*********开始【京东账号${$.index}】${$.nickName || $.UserName}*********\n`);
+            if ($.unLogins.includes($.index)) {
+                console.log("Cookie已失效. . .")
+                continue
+            }
+            if ($.helpRunout.includes($.index) || $.helpOut.includes($.UserName)) {
+                console.log("助力次数耗尽、不执行此账号. . .")
+                continue
+            }
+            if ($.blackIndexs.includes($.index)) {
+                console.log("种豆数据异常、不执行此账号. . .")
+                continue
+            }
+            await shareCodesFormat();
+            if (!newShareCodes.length) {
+                console.log("已无账号需要助力，助力结束")
+                break
+            }
+            await doHelp(); //助力
+            if ($.index % 5 == 0) {
+                console.log(`\n\n***************** 每5个账号休息1分钟、已用时${parseInt((new Date().getTime() - $.theStart) / 1000)}秒 *****************\n`)
+                await $.wait(parseInt(Math.random() * 5000 + 60000, 10))
+            }
+        }
+    }
+
+    thefs.writeFile(outpath, JSON.stringify($.HelpOuts), function (err) {
+        if (err) console.log(`\n\n写入缓存失败：${err}\n`)
+        else console.log("\n\n写入缓存成功 . . .\n")
+    })
+    await $.wait(1000)
+
     if ($.isNode() && allMessage) {
         await notify.sendNotify(`${$.name}`, `${allMessage}`)
     }
-})().catch((e) => {
-    $.log('', `❌ ${$.name}, 失败! 原因: ${e}!`, '')
-}).finally(() => {
-    $.done();
-})
+})()
+    .catch((e) => {
+        $.log('', `❌ ${$.name}, 失败! 原因: ${e}!`, '')
+    })
+    .finally(() => {
+        $.done();
+    })
 
 async function jdPlantBean() {
     try {
-        console.log(`获取任务及基本信息`)
+        // console.log(`获取任务及基本信息`)
         await plantBeanIndex();
+        if (!$.plantBeanIndexResult) return
         if ($.plantBeanIndexResult.errorCode === 'PB101') {
             console.log(`\n活动太火爆了，还是去买买买吧！\n`)
             return
@@ -88,8 +185,16 @@ async function jdPlantBean() {
         // console.log(plantBeanIndexResult.data.taskList);
         if ($.plantBeanIndexResult && $.plantBeanIndexResult.code === '0' && $.plantBeanIndexResult.data) {
             const shareUrl = $.plantBeanIndexResult.data.jwordShareInfo.shareUrl
-            $.myPlantUuid = getParam(shareUrl, 'plantUuid')
-            console.log(`\n【京东账号${$.index}（${$.UserName}）的${$.name}好友互助码】${$.myPlantUuid}\n`);
+            $.thisCode = getParam(shareUrl, 'plantUuid')
+            console.log(`互助码:${$.thisCode}\n`);
+
+            let thisarr = []
+            thisarr.push($.index)
+            thisarr.push($.thisCode)
+            thisarr.push($.UserName)
+            if (checkArr($.otherCodes, $.thisCode) == -1 && !$.myFronts.includes($.index)) $.otherCodes.push(thisarr)
+            if (checkArr($.myCodes, $.thisCode) == -1 && $.myFronts.length > 0 && $.myFronts.includes($.index)) $.myCodes.push(thisarr)
+
             roundList = $.plantBeanIndexResult.data.roundList;
             currentRoundId = roundList[num].roundId;//本期的roundId
             lastRoundId = roundList[num - 1].roundId;//上期的roundId
@@ -99,7 +204,6 @@ async function jdPlantBean() {
             message += `【上期时间】${roundList[num - 1].dateDesc.replace('上期 ', '')}\n`;
             message += `【上期成长值】${roundList[num - 1].growth}\n`;
             await receiveNutrients();//定时领取营养液
-            await doHelp();//助力
             await doTask();//做日常任务
             //await doEgg();//注释结束任务
             await stealFriendWater();
@@ -108,7 +212,8 @@ async function jdPlantBean() {
             await showTaskProcess();
             await plantShareSupportList();
         } else {
-            console.log(`种豆得豆-初始失败:  ${JSON.stringify($.plantBeanIndexResult)}`);
+            console.log(`初始化种豆得豆-数据异常:  ${JSON.stringify($.plantBeanIndexResult) || "未知"}`);
+            if (!$.blackIndexs.includes($.index)) $.blackIndexs.push($.index)
         }
     } catch (e) {
         $.logErr(e);
@@ -397,33 +502,46 @@ function showTaskProcess() {
 
 //助力好友
 async function doHelp() {
-    for (let plantUuid of newShareCodes) {
-        console.log(`开始助力京东账号${$.index} - ${$.nickName}的好友: ${plantUuid}`);
-        if (!plantUuid) continue;
-        if (plantUuid === $.myPlantUuid) {
-            console.log(`\n跳过自己的plantUuid\n`)
+    console.log(`格式化后的助力码:${JSON.stringify(getCodes(newShareCodes))}\n`);
+    for (let v of newShareCodes) {
+        code = v[1]
+        $.theName = v[2]
+        console.log(`开始助力好友: ${code}`);
+        if (!code) continue;
+        if ($.index === v[0]) {
+            console.log('不能助力自己、跳过执行 . . .\n')
             continue
         }
-        await helpShare(plantUuid);
+        await helpShare(code);
         if ($.helpResult && $.helpResult.code === '0') {
-            // console.log(`助力好友结果: ${JSON.stringify($.helpResult.data.helpShareRes)}`);
+            // console.log(`助力好友结果: ${JSON.stringify($.helpResult)}`);
+
+
             if ($.helpResult.data && $.helpResult.data.helpShareRes) {
                 if ($.helpResult.data.helpShareRes.state === '1') {
-                    console.log(`助力好友${plantUuid}成功`)
+                    console.log(`助力好友【${$.helpResult.data.plantUserInfo.plantNickName || $.theName}】成功`)
                     console.log(`${$.helpResult.data.helpShareRes.promptText}\n`);
                 } else if ($.helpResult.data.helpShareRes.state === '2') {
-                    console.log('您今日助力的机会已耗尽，已不能再帮助好友助力了\n');
+                    console.log(`助力好友【${$.helpResult.data.plantUserInfo.plantNickName || $.theName}】失败，您今天助力次数已耗尽`);
+                    console.log(`${$.helpResult.data.helpShareRes.promptText}\n`);
+                    if (!$.helpRunout.includes($.index)) $.helpRunout.push($.index)
+                    if ($.HelpOuts.helpOut.indexOf($.UserName) == -1) $.HelpOuts.helpOut.push($.UserName)
                     break;
                 } else if ($.helpResult.data.helpShareRes.state === '3') {
-                    console.log('该好友今日已满9人助力/20瓶营养液,明天再来为Ta助力吧\n')
+                    console.log(` 该好友【${$.helpResult.data.plantUserInfo.plantNickName || $.theName}】今日已满9人助力/20瓶营养液,明天再来为Ta助力吧`)
+                    console.log(`打印已满: ${$.helpResult.data.helpShareRes.promptText}\n`);
+                    if (checkArr($.myCodes, code) > -1) $.myCodes.splice(checkArr($.myCodes, code), 1) // 剔除助力已满的助力码
+                    if (checkArr($.otherCodes, code) > -1) $.otherCodes.splice(checkArr($.otherCodes, code), 1) // 剔除助力已满的助力码
+                    if ($.HelpOuts.helpFull.indexOf($.theName) == -1) $.HelpOuts.helpFull.push($.theName)
                 } else if ($.helpResult.data.helpShareRes.state === '4') {
+                    console.log(`助力好友【${$.helpResult.data.plantUserInfo.plantNickName || $.theName}】失败`);
                     console.log(`${$.helpResult.data.helpShareRes.promptText}\n`)
                 } else {
-                    console.log(`助力其他情况：${JSON.stringify($.helpResult.data.helpShareRes)}`);
+                    console.log(`助力其他情况：${JSON.stringify($.helpResult.data.helpShareRes)}\n`);
                 }
             }
         } else {
-            console.log(`助力好友失败: ${JSON.stringify($.helpResult)}`);
+            console.log(`助力好友失败: ${JSON.stringify($.helpResult)}\n`);
         }
     }
 }
@@ -537,7 +655,7 @@ async function plantShareSupportList() {
 
 //助力好友的api
 async function helpShare(plantUuid) {
-    console.log(`\n开始助力好友: ${plantUuid}`);
+    // console.log(`\n开始助力好友: ${plantUuid}`);
     const body = {
         "plantUuid": plantUuid,
         "wxHeadImgUrl": "",
@@ -545,7 +663,7 @@ async function helpShare(plantUuid) {
         "followType": "1",
     }
     $.helpResult = await request(`plantBeanIndex`, body);
-    console.log(`助力结果的code:${$.helpResult && $.helpResult.code}`);
+    console.log(`助力结果的code: ${$.helpResult && $.helpResult.code}`);
 }
 
 async function plantBeanIndex() {
@@ -555,23 +673,17 @@ async function plantBeanIndex() {
 //格式化助力码
 function shareCodesFormat() {
     return new Promise(async resolve => {
-        // console.log(`第${$.index}个京东账号的助力码:::${$.shareCodesArr[$.index - 1]}`)
         newShareCodes = [];
-        if ($.shareCodesArr[$.index - 1]) {
-            newShareCodes = $.shareCodesArr[$.index - 1].split('@');
-        } else {
-            //  console.log(`由于您第${$.index}个京东账号未提供shareCode,将采纳本脚本自带的助力码\n`)
-            const tempIndex = $.index > shareCodes.length ? (shareCodes.length - 1) : ($.index - 1);
-            newShareCodes = shareCodes[tempIndex].split('@');
-        }
-        console.log(`第${$.index}个京东账号将要助力的好友${JSON.stringify(newShareCodes)}`)
+        if ($.myCodes.length > 0) for (let i of $.myCodes) newShareCodes.push(i)
+        if (helpRandom + "" === "true") $.otherCodes = randomArr($.otherCodes) // 随机排序
+        if ($.otherCodes.length > 0) for (let j of $.otherCodes) newShareCodes.push(j)
         resolve();
     })
 }
 
 function requireConfig() {
     return new Promise(resolve => {
-        console.log('开始获取种豆得豆配置文件\n')
+        // console.log('开始获取种豆得豆配置文件\n')
         notify = $.isNode() ? require('./sendNotify') : '';
         //Node.js用户请在jdCookie.js处填写京东ck;
         const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
@@ -587,20 +699,11 @@ function requireConfig() {
         } else {
             cookiesArr = [$.getdata('CookieJD'), $.getdata('CookieJD2'), ...jsonParse($.getdata('CookiesJD') || "[]").map(item => item.cookie)].filter(item => !!item);
         }
-        console.log(`共${cookiesArr.length}个京东账号\n`)
-        $.shareCodesArr = [];
-        if ($.isNode()) {
-            Object.keys(jdPlantBeanShareCodes).forEach((item) => {
-                if (jdPlantBeanShareCodes[item]) {
-                    $.shareCodesArr.push(jdPlantBeanShareCodes[item])
-                }
-            })
-        } else {
-            if ($.getdata('jd_plantbean_inviter')) $.shareCodesArr = $.getdata('jd_plantbean_inviter').split('\n').filter(item => !!item);
-            console.log(`\nBoxJs设置的${$.name}好友邀请码:${$.getdata('jd_plantbean_inviter') ? $.getdata('jd_plantbean_inviter') : '暂无'}\n`);
-        }
-        // console.log(`\n种豆得豆助力码::${JSON.stringify($.shareCodesArr)}`);
-        console.log(`您提供了${$.shareCodesArr.length}个账号的种豆得豆助力码\n`);
+        console.log(`共${cookiesArr.length}个京东账号\n\n============================================================`)
+        console.log(`你的互助配置如下：\n互助模式：${helpRandom + "" === "true" ? '随机互助' : '顺序互助'}\n优先被助力账号：${$.myFronts.length > 0 ? $.myFronts.toString() : '未设定'}`);
+        console.log(`\n环境变量设置提示：\nexport jd_helpFronts="1,2,3-5" 表示账号12345固定优先被助力\nexport jd_helpRandom="true" 表示固定助力过后全部随机助力、反之顺序助力`);
+        console.log(`\n脚本先执行日常任务，最后再执行内部互助\n助力码直接脚本获取，解决助力码过长问题\n助力已满和耗尽的号，会缓存至本地以过滤`);
+        console.log(`============================================================`)
         resolve()
     })
 }
@@ -749,6 +852,38 @@ function jsonParse(str) {
             return [];
         }
     }
+}
+
+function generateArr(start, end) {
+    return Array.from(new Array(end + 1).keys()).slice(start)
+}
+
+// 获取下标 和 判断是否存在
+function checkArr(arr, val) {
+    for (let p = 0; p < arr.length; p++) {
+        if (arr[p][0] == val || arr[p][1] == val || arr[p][2] == val) {
+            return p
+        }
+    }
+    return -1
+}
+
+// 读取助力码
+function getCodes(arr) {
+    let codeStr = []
+    for (let p of arr) codeStr.push(p[1])
+    // codeStr = codeStr.toString()
+    return codeStr
+}
+
+// 数组均衡随机排序
+function randomArr(arr) {
+    let i = arr.length;
+    while (i) {
+        let j = Math.floor(Math.random() * i--);
+        [arr[j], arr[i]] = [arr[i], arr[j]];
+    }
+    return arr
 }
 
 // prettier-ignore
