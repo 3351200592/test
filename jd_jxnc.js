@@ -187,7 +187,7 @@ function requireConfig() {
 
 		// console.log(`jdFruitShareArr::${JSON.stringify(jxncShareCodeArr)}`)
 		// console.log(`jdFruitShareArr账号长度::${jxncShareCodeArr.length}`)
-		$.log(`您提供了${jxncShareCodeArr.length}个账号的京喜农场助力码`);
+		// $.log(`您提供了${jxncShareCodeArr.length}个账号的京喜农场助力码`);
 
 		try {
 			let options = {
@@ -277,7 +277,7 @@ function shareCodesFormat() {
 			currentShareCode = jxncShareCodeArr[$.index - 1].split('@');
 			currentShareCode.push(...(shareCode.split('@')));
 		} else {
-			$.log(`由于您第${$.index}个京东账号未提供shareCode,将采纳本脚本自带的助力码`)
+			// $.log(`由于您第${$.index}个京东账号未提供shareCode,将采纳本脚本自带的助力码`)
 			currentShareCode = shareCode.split('@');
 		}
 		$.log(`第${$.index}个京东账号将要助力的好友${JSON.stringify(currentShareCode)}`)
