@@ -349,6 +349,11 @@ async function helpFriends() {
                 console.log(`助力好友【${$.theName}】结果：好友蓄电池已满、无需助力\n`)
                 if (checkArr($.myCodes, code) > -1) $.myCodes.splice(checkArr($.myCodes, code), 1) // 剔除蓄电池已满的助力码
                 if (checkArr($.otherCodes, code) > -1) $.otherCodes.splice(checkArr($.otherCodes, code), 1) // 剔除蓄电池已满的助力码
+            } else if  (helpRes.data && helpRes.data.bizMsg && helpRes.data.bizMsg.indexOf("助力已满员") > -1) {
+                console.log(`助力好友【${$.theName}】结果：好友助力已满、无需助力\n`)
+                if (checkArr($.myCodes, code) > -1) $.myCodes.splice(checkArr($.myCodes, code), 1) // 剔除助力已满的助力码
+                if (checkArr($.otherCodes, code) > -1) $.otherCodes.splice(checkArr($.otherCodes, code), 1) // 剔除助力已满的助力码
+                if ($.HelpOuts.helpFull.indexOf($.theName) == -1) $.HelpOuts.helpFull.push($.theName)
             } else {
                 console.log(`助力好友【${$.theName}】结果：${JSON.stringify(helpRes)}\n`)
             }
