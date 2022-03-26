@@ -116,6 +116,7 @@ let num;
     }
 
     console.log(`\n\n\n======================= 开始互助 =======================`);
+    $.heplTimes = 0
     for (let i = 0; i < cookiesArr.length; i++) {
         if (cookiesArr[i]) {
             cookie = cookiesArr[i];
@@ -140,9 +141,10 @@ let num;
                 console.log("已无账号需要助力，助力结束")
                 break
             }
+            $.heplTimes = $.heplTimes + 1
             await doHelp(); //助力
-            if ($.index % 5 == 0) {
-                console.log(`\n\n***************** 每5个账号休息1分钟、已用时${parseInt((new Date().getTime() - $.theStart) / 1000)}秒 *****************\n`)
+            if ($.heplTimes % 5 == 0) {
+                console.log(`\n\n***************** 每请求5个账号休息1分钟、已用时${parseInt((new Date().getTime() - $.theStart) / 1000)}秒 *****************\n`)
                 await $.wait(parseInt(Math.random() * 5000 + 60000, 10))
             }
         }
@@ -519,29 +521,29 @@ async function doHelp() {
 
             if ($.helpResult.data && $.helpResult.data.helpShareRes) {
                 if ($.helpResult.data.helpShareRes.state === '1') {
-                    console.log(`助力好友【${$.helpResult.data.plantUserInfo.plantNickName || $.theName}】成功`)
+                    console.log(`助力好友【${$.theName}】成功`)
                     console.log(`${$.helpResult.data.helpShareRes.promptText}\n`);
                 } else if ($.helpResult.data.helpShareRes.state === '2') {
-                    console.log(`助力好友【${$.helpResult.data.plantUserInfo.plantNickName || $.theName}】失败，您今天助力次数已耗尽`);
+                    console.log(`助力好友【${$.theName}】失败，您今天助力次数已耗尽`);
                     console.log(`${$.helpResult.data.helpShareRes.promptText}\n`);
                     if (!$.helpRunout.includes($.index)) $.helpRunout.push($.index)
                     if ($.HelpOuts.helpOut.indexOf($.UserName) == -1) $.HelpOuts.helpOut.push($.UserName)
                     break;
                 } else if ($.helpResult.data.helpShareRes.state === '3') {
-                    console.log(` 该好友【${$.helpResult.data.plantUserInfo.plantNickName || $.theName}】今日已满9人助力/20瓶营养液,明天再来为Ta助力吧`)
-                    console.log(`打印已满: ${$.helpResult.data.helpShareRes.promptText}\n`);
+                    console.log(` 该好友【${$.theName}】今日已满9人助力/20瓶营养液,明天再来为Ta助力吧`)
+                    console.log(`${$.helpResult.data.helpShareRes.promptText}\n`);
                     if (checkArr($.myCodes, code) > -1) $.myCodes.splice(checkArr($.myCodes, code), 1) // 剔除助力已满的助力码
                     if (checkArr($.otherCodes, code) > -1) $.otherCodes.splice(checkArr($.otherCodes, code), 1) // 剔除助力已满的助力码
                     if ($.HelpOuts.helpFull.indexOf($.theName) == -1) $.HelpOuts.helpFull.push($.theName)
                 } else if ($.helpResult.data.helpShareRes.state === '4') {
-                    console.log(`助力好友【${$.helpResult.data.plantUserInfo.plantNickName || $.theName}】失败`);
+                    console.log(`助力好友【${$.theName}】失败`);
                     console.log(`${$.helpResult.data.helpShareRes.promptText}\n`)
                 } else {
                     console.log(`助力其他情况：${JSON.stringify($.helpResult.data.helpShareRes)}\n`);
                 }
-            }
+            } else console.log(`助力好友失败1: ${JSON.stringify($.helpResult)}\n`);
         } else {
-            console.log(`助力好友失败: ${JSON.stringify($.helpResult)}\n`);
+            console.log(`助力好友失败2: ${JSON.stringify($.helpResult)}\n`);
         }
     }
 }
