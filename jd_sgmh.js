@@ -324,7 +324,7 @@ async function helpFriends() {
         let res = await doHelp(code, $.theTaskId)
         if (res) {
 
-            console.log(`打印助力结果：${res?.data?.bizMsg ?? JSON.stringify(res)}`)
+            // console.log(`打印助力结果：${res?.data?.bizMsg ?? JSON.stringify(res)}`)
 
             if (res?.data?.bizMsg && res.data.bizMsg.indexOf("success") > -1) {
                 console.log(`助力好友【${$.theName}】成功\n`)
