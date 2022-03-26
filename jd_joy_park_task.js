@@ -105,6 +105,7 @@ message = ""
         }
         if (task.taskType === 'BROWSE_PRODUCT' || task.taskType === 'BROWSE_CHANNEL') {
           let productList = await apTaskDetail(task.id,task.taskType);
+          if (!productList) return
           let productListNow = 0;
           if (productList.length === 0) {
             let resp = await apTaskDrawAward(task.id,task.taskType);
@@ -120,10 +121,12 @@ message = ""
               break
             }
             $.log(`${task.taskTitle} ${task.taskDoTimes}/${task.taskLimitTimes}`);
-            let resp = await apDoTask(task.id,task.taskType,productList[productListNow].itemId,productList[productListNow].appid);
-            if (!resp.success) {
-              $.log(`${task.taskTitle} 任务完成！`)
-              break
+            if (productList[productListNow]) {
+              let resp = await apDoTask(task.id,task.taskType,productList[productListNow].itemId,productList[productListNow].appid);
+              if (!resp.success) {
+                $.log(`${task.taskTitle} 任务完成！`)
+                break
+              }
             }
             productListNow++;
             task.taskDoTimes++;
