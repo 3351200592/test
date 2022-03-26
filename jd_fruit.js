@@ -126,6 +126,7 @@ const urlSchema = `openjd://virtual?params=%7B%20%22category%22:%20%22jump%22,%2
     }
 
     console.log(`\n\n\n======================= 开始互助 =======================`);
+    $.heplTimes = 0
     for (let i = 0; i < cookiesArr.length; i++) {
         if (cookiesArr[i]) {
             cookie = cookiesArr[i];
@@ -150,11 +151,12 @@ const urlSchema = `openjd://virtual?params=%7B%20%22category%22:%20%22jump%22,%2
                 console.log("已无账号需要助力，助力结束")
                 break
             }
+            $.heplTimes = $.heplTimes + 1
             await getAwardInviteFriend();
             await turntableFarm(1); //天天抽奖得好礼
             await masterHelpShare();//助力好友
-            if ($.index % 5 == 0) {
-                console.log(`\n\n***************** 每5个账号休息1分钟、已用时${parseInt((new Date().getTime() - $.theStart) / 1000)}秒 *****************`)
+            if ($.heplTimes % 5 == 0) {
+                console.log(`\n\n***************** 每请求5个账号休息1分钟、已用时${parseInt((new Date().getTime() - $.theStart) / 1000)}秒 *****************`)
                 await $.wait(parseInt(Math.random() * 5000 + 60000, 10))
             }
         }
@@ -719,12 +721,12 @@ async function turntableFarm(flag = 0) {
         }
         if (flag == 1) {
             //天天抽奖助力
-            console.log('\n\n开始天天抽奖-好友助力-每人每天只有三次助力机会')
+            console.log('\n\n开始天天抽奖-好友助力-每人每天只有三次助力机会\n')
             for (let v of newShareCodes) {
                 code = v[1]
                 $.theName = v[2]
                 if ($.index === v[0]) {
-                    console.log('不能助力自己、跳过执行 . . .')
+                    console.log('不能助力自己、跳过执行 . . .\n')
                     continue
                 }
                 // await $.wait(1000)
@@ -840,7 +842,7 @@ async function masterHelpShare() {
         console.log(`开始助力好友: ${code}`);
         if (!code) continue;
         if ($.index === v[0]) {
-            console.log('不能助力自己、跳过执行 . . .')
+            console.log('不能助力自己、跳过执行 . . .\n')
             continue
         }
         // await $.wait(1000)
@@ -874,7 +876,7 @@ async function masterHelpShare() {
                 break
             }
         } else {
-            console.log(`助力失败: ${JSON.stringify($.helpResult)}`);
+            console.log(`助力失败: ${JSON.stringify($.helpResult)}\n`);
         }
     }
     if ($.isLoon() || $.isQuanX() || $.isSurge()) {
