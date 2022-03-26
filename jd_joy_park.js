@@ -35,9 +35,6 @@ $.log(`最大化收益模式: 已${$.JOY_COIN_MAXIMIZE ? `默认开启` : `关�
 const JD_API_HOST = `https://api.m.jd.com/client.action`;
 message = ""
 
-
-cookiesArr = cookiesArr.slice(0, 5)
-
 !(async () => {
     $.user_agent = require('./USER_AGENTS').USER_AGENT
     if (!cookiesArr[0]) {
