@@ -246,7 +246,7 @@ if ($.isNode()) {
             $.helpTimes = $.helpTimes + 1
             await helpFriends();//助力好友
             if ($.helpTimes % 5 == 0) {
-                console.log(`\n\n***************** 每5次请求休息半分钟、已用时${parseInt((new Date().getTime() - $.theStart) / 1000)}秒 *****************\n`)
+                console.log(`\n\n***************** 每请求5个账号休息半分钟、已用时${parseInt((new Date().getTime() - $.theStart) / 1000)}秒 *****************\n`)
                 await $.wait(parseInt(Math.random() * 5000 + 30000, 10))
             }
         }
@@ -549,7 +549,7 @@ async function helpFriends() {
         console.log(`开始助力好友: ${code}`);
         if (!code) continue;
         if ($.index === v[0]) {
-            console.log('不能助力自己、跳过执行 . . .')
+            console.log('不能助力自己、跳过执行 . . .\n')
             continue
         }
 
