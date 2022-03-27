@@ -184,11 +184,10 @@ message = ""
                     continue
                 }
                 let resp = await getJoyBaseInfo(610, 1, code);
-                if (!resp) return
-                
+
                 // console.log(`助力结果: ${JSON.stringify(resp)}`);
 
-                if (resp.success) {
+                if (resp && resp.success) {
                     if (resp.data.helpState === 1) {
                         $.log(`助力好友【${$.theName}】成功！\n`);
                     } else if (resp.data.helpState === 0) {
