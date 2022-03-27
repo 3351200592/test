@@ -459,9 +459,14 @@ async function petSport() {
     let times = 1
     const code = 0
     let resultCode = 0
+    let errtimes = 0
     do {
         let response = await request(arguments.callee.name.toString())
-        if (!response) continue
+        if (!response) {
+            errtimes = errtimes + 1
+            if (errtimes <= 8) continue
+            else break
+        }
         console.log(`第${times}次遛狗完成: ${JSON.stringify(response)}`);
         resultCode = response.resultCode;
         if (resultCode == 0) {
@@ -535,9 +540,14 @@ async function browseShopsInitFun() {
     let times = 0;
     let resultCode = 0;
     let code = 0;
+    let errtimes = 0
     do {
         let response = await request("getBrowseShopsReward");
-        if (!response) continue
+        if (!response) {
+            errtimes = errtimes + 1
+            if (errtimes <= 8) continue
+            else break
+        }
         console.log(`第${times}次浏览店铺结果: ${JSON.stringify(response)}`);
         code = response.code;
         resultCode = response.resultCode;
@@ -557,7 +567,7 @@ async function inviteFriendsInitFun() {
     if ($.taskInfo.inviteFriendsInit && $.taskInfo.inviteFriendsInit.status == 1 && $.taskInfo.inviteFriendsInit.inviteFriendsNum > 0) {
         // 如果有邀请过新用户,自动领取60gg奖励
         const res = await request('getInviteFriendsReward');
-        if (res.code == 0 && res.resultCode == 0) {
+        if (res && res.code == 0 && res.resultCode == 0) {
             console.log(`领取邀请新用户奖励成功,获得狗粮现有狗粮${$.taskInfo.inviteFriendsInit.reward}g，${res.result.foodAmount}g`);
             message += `【邀请新用户】获取狗粮${$.taskInfo.inviteFriendsInit.reward}g\n`;
         }
@@ -572,10 +582,15 @@ async function feedReachInitFun() {
     let finishedTimes = $.taskInfo.feedReachInit.hadFeedAmount / 10; //已经喂养了几次
     let needFeedTimes = 10 - finishedTimes; //还需要几次
     let tryTimes = 20; //尝试次数
+    let errtimes = 0
     do {
         console.log(`还需要投食${needFeedTimes}次`);
         const response = await request('feedPets');
-        if (!response) continue
+        if (!response) {
+            errtimes = errtimes + 1
+            if (errtimes <= 8) continue
+            else break
+        }
         console.log(`本次投食结果: ${JSON.stringify(response)}`);
         if (response.resultCode == 0 && response.code == 0) {
             needFeedTimes--;
