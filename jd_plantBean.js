@@ -539,11 +539,11 @@ async function doHelp() {
                     console.log(`助力好友【${$.theName}】失败`);
                     console.log(`${$.helpResult.data.helpShareRes.promptText}\n`)
                 } else {
-                    console.log(`助力其他情况：${JSON.stringify($.helpResult.data.helpShareRes)}\n`);
+                    console.log(`助力好友【${$.theName}】其他情况：${JSON.stringify($.helpResult.data.helpShareRes)}\n`);
                 }
-            } else console.log(`助力好友失败1: ${JSON.stringify($.helpResult)}\n`);
+            } else console.log(`助力好友【${$.theName}】失败1: ${JSON.stringify($.helpResult)}\n`);
         } else {
-            console.log(`助力好友失败2: ${JSON.stringify($.helpResult)}\n`);
+            console.log(`助力好友【${$.theName}】失败2: ${JSON.stringify($.helpResult)}\n`);
         }
     }
 }
