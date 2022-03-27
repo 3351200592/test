@@ -215,7 +215,7 @@ async function helpFriends() {
 				if ($.HelpOuts.helpOut.indexOf($.UserName) == -1) $.HelpOuts.helpOut.push($.UserName)
 				break
 			} else {
-				console.log(`助力好友【${$.theName}】失败：`, res?.data?.bizMsg ?? JSON.stringify(res))
+				console.log(`助力好友【${$.theName}】失败：${res?.data?.bizMsg ?? JSON.stringify(res)}\n`)
 			}
 			await $.wait(1000)
 		}
