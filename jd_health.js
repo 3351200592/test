@@ -19,23 +19,13 @@ let outpath = './Health_HelpOut.json'
 $.HelpOuts = { "thisDay": new Date().getDate(), "helpOut": [], "helpFull": [] }
 $.Helptext = ""
 $.helpJson = {}
-
-if (thefs.existsSync(outpath)) $.Helptext = thefs.readFileSync(outpath, 'utf-8')
-if ($.Helptext) $.helpJson = JSON.parse($.Helptext)
-if (JSON.stringify($.helpJson) != "{}" && $.helpJson.thisDay && $.helpJson.thisDay == $.HelpOuts.thisDay) {
-	if ($.helpJson.helpOut && $.helpJson.helpOut.length) for (let n of $.helpJson.helpOut) if ($.HelpOuts.helpOut.indexOf(n) == -1) $.HelpOuts.helpOut.push(n)
-	if ($.helpJson.helpFull && $.helpJson.helpFull.length) for (let m of $.helpJson.helpFull) if ($.HelpOuts.helpFull.indexOf(m) == -1) $.HelpOuts.helpFull.push(m)
-}
-
-$.helpOut = $.HelpOuts.helpOut
-$.helpFull = $.HelpOuts.helpFull
-
 $.unLogins = []
 $.otherCodes = []
 $.myCodes = []
 $.myFronts = []
 $.helpRunout = []
 $.blackIndexs = []
+
 // 互助环境变量1 设定固定车头助力码、大小写逗号隔开、连续多个可直接用 - 、如：1-10，可混用如：1,2,3,7-15
 let helpFronts = $.isNode() ? (process.env.jd_helpFronts ? process.env.jd_helpFronts : []) : []
 // 互助环境变量2 除了固定互助码放前面被助力 之外的账号 设定随机还是顺序助力，true为随机，false为顺序
@@ -98,12 +88,7 @@ const JD_API_HOST = "https://api.m.jd.com/";
 		}
 	}
 
-	if ($.helpFull.length) {
-		for (let t of $.helpFull) {
-			if (checkArr($.myCodes, t) > -1) $.myCodes.splice(checkArr($.myCodes, t), 1) // 剔除助力已满的助力码
-			if (checkArr($.otherCodes, t) > -1) $.otherCodes.splice(checkArr($.otherCodes, t), 1) // 剔除助力已满的助力码
-		}
-	}
+	await getCodesCache()
 
 	console.log(`\n\n\n======================= 开始互助 =======================`);
 	$.helpTimes = 0
@@ -290,8 +275,8 @@ function getTaskDetail(taskId = '') {
 									} else if (vo.taskType === 10) {
 										await doTask(vo.threeMealInfoVos[0]?.taskToken, vo?.taskId)
 									} else if (vo.taskType === 26 || vo.taskType === 3) {
-										await doTask(vo.shoppingActivityVos[0]?.taskToken, vo?.taskId)	
-									} 
+										await doTask(vo.shoppingActivityVos[0]?.taskToken, vo?.taskId)
+									}
 									else if (vo.taskType === 1) {
 										for (let key of Object.keys(vo.followShopVo)) {
 											let taskFollow = vo.followShopVo[key]
@@ -520,6 +505,23 @@ function TotalBean() {
 			}
 		})
 	})
+}
+
+async function getCodesCache() {
+	if (thefs.existsSync(outpath)) $.Helptext = thefs.readFileSync(outpath, 'utf-8')
+	if ($.Helptext) $.helpJson = JSON.parse($.Helptext)
+	if (JSON.stringify($.helpJson) != "{}" && $.helpJson.thisDay && $.helpJson.thisDay == $.HelpOuts.thisDay) {
+		if ($.helpJson.helpOut && $.helpJson.helpOut.length) for (let n of $.helpJson.helpOut) if ($.HelpOuts.helpOut.indexOf(n) == -1) $.HelpOuts.helpOut.push(n)
+		if ($.helpJson.helpFull && $.helpJson.helpFull.length) for (let m of $.helpJson.helpFull) if ($.HelpOuts.helpFull.indexOf(m) == -1) $.HelpOuts.helpFull.push(m)
+	}
+	$.helpOut = $.HelpOuts.helpOut
+	$.helpFull = $.HelpOuts.helpFull
+	if ($.helpFull.length) {
+		for (let t of $.helpFull) {
+			if (checkArr($.myCodes, t) > -1) $.myCodes.splice(checkArr($.myCodes, t), 1) // 剔除助力已满的助力码
+			if (checkArr($.otherCodes, t) > -1) $.otherCodes.splice(checkArr($.otherCodes, t), 1) // 剔除助力已满的助力码
+		}
+	}
 }
 
 function generateArr(start, end) {
