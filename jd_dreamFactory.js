@@ -35,33 +35,10 @@ let outpath = './DreamFactory_HelpOut.json'
 $.HelpOuts = { "thisDay": new Date().getDate(), "helpOut": [], "helpFull": [] }
 $.Helptext = ""
 $.helpJson = {}
-
-if (thefs.existsSync(outpath)) $.Helptext = thefs.readFileSync(outpath, 'utf-8')
-if ($.Helptext) $.helpJson = JSON.parse($.Helptext)
-if (JSON.stringify($.helpJson) != "{}" && $.helpJson.thisDay && $.helpJson.thisDay == $.HelpOuts.thisDay) {
-    if ($.helpJson.helpOut && $.helpJson.helpOut.length) for (let n of $.helpJson.helpOut) if ($.HelpOuts.helpOut.indexOf(n) == -1) $.HelpOuts.helpOut.push(n)
-    if ($.helpJson.helpFull && $.helpJson.helpFull.length) for (let m of $.helpJson.helpFull) if ($.HelpOuts.helpFull.indexOf(m) == -1) $.HelpOuts.helpFull.push(m)
-}
-
-$.helpOut = $.HelpOuts.helpOut
-$.helpFull = $.HelpOuts.helpFull
-
-
 let Tuanoutpath = './DreamFactory_TuanOut.json'
 $.TuanHelpOuts = { "thisDay": new Date().getDate(), "helpOut": [], "helpFull": [] }
 $.TuanHelptext = ""
 $.TuanhelpJson = {}
-
-if (thefs.existsSync(Tuanoutpath)) $.TuanHelptext = thefs.readFileSync(Tuanoutpath, 'utf-8')
-if ($.TuanHelptext) $.TuanhelpJson = JSON.parse($.TuanHelptext)
-if (JSON.stringify($.TuanhelpJson) != "{}" && $.TuanhelpJson.thisDay && $.TuanhelpJson.thisDay == $.TuanHelpOuts.thisDay) {
-    if ($.TuanhelpJson.helpOut && $.TuanhelpJson.helpOut.length) for (let n of $.TuanhelpJson.helpOut) if ($.TuanHelpOuts.helpOut.indexOf(n) == -1) $.TuanHelpOuts.helpOut.push(n)
-    if ($.TuanhelpJson.helpFull && $.TuanhelpJson.helpFull.length) for (let m of $.TuanhelpJson.helpFull) if ($.TuanHelpOuts.helpFull.indexOf(m) == -1) $.TuanHelpOuts.helpFull.push(m)
-}
-
-$.TuanhelpOut = $.TuanHelpOuts.helpOut
-$.TuanhelpFull = $.TuanHelpOuts.helpFull
-
 $.unLogins = []
 $.otherCodes = []
 $.myCodes = []
@@ -69,6 +46,7 @@ $.myFronts = []
 $.helpRunout = []
 $.TuanhelpRunout = []
 $.blackIndexs = []
+
 // 互助环境变量1 设定固定车头助力码、大小写逗号隔开、连续多个可直接用 - 、如：1-10，可混用如：1,2,3,7-15
 let helpFronts = $.isNode() ? (process.env.jd_helpFronts ? process.env.jd_helpFronts : []) : []
 // 互助环境变量2 除了固定互助码放前面被助力 之外的账号 设定随机还是顺序助力，true为随机，false为顺序
@@ -167,6 +145,8 @@ if ($.isNode()) {
     console.log(`\n\n***************** 日常任务结束、已用时${parseInt((new Date().getTime() - $.theStart) / 1000)}秒 *****************`)
     console.log(`\n\n***************** 开始账号内部相互进团 *****************\n\n`)
 
+    await getCodesCache()
+
     $.times = 0
     for (let i = 0; i < cookiesArr.length; i++) {
         if (cookiesArr[i]) {
@@ -209,15 +189,8 @@ if ($.isNode()) {
     }
 
     console.log(`\n\n***************** 参团任务结束、已用时${parseInt((new Date().getTime() - $.theStart) / 1000)}秒 *****************`)
-
-    if ($.helpFull.length) {
-        for (let t of $.helpFull) {
-            if (checkArr($.myCodes, t) > -1) $.myCodes.splice(checkArr($.myCodes, t), 1) // 剔除助力已满的助力码
-            if (checkArr($.otherCodes, t) > -1) $.otherCodes.splice(checkArr($.otherCodes, t), 1) // 剔除助力已满的助力码
-        }
-    }
-
     console.log(`\n\n\n======================= 开始互助 =======================`);
+
     $.helpTimes = 0
     for (let i = 0; i < cookiesArr.length; i++) {
         if (cookiesArr[i]) {
@@ -1860,6 +1833,31 @@ function jsonParse(str) {
             console.log(e);
             $.msg($.name, '', '请勿随意在BoxJs输入框修改内容\n建议通过脚本去获取cookie')
             return [];
+        }
+    }
+}
+
+async function getCodesCache() {
+    if (thefs.existsSync(outpath)) $.Helptext = thefs.readFileSync(outpath, 'utf-8')
+    if ($.Helptext) $.helpJson = JSON.parse($.Helptext)
+    if (JSON.stringify($.helpJson) != "{}" && $.helpJson.thisDay && $.helpJson.thisDay == $.HelpOuts.thisDay) {
+        if ($.helpJson.helpOut && $.helpJson.helpOut.length) for (let n of $.helpJson.helpOut) if ($.HelpOuts.helpOut.indexOf(n) == -1) $.HelpOuts.helpOut.push(n)
+        if ($.helpJson.helpFull && $.helpJson.helpFull.length) for (let m of $.helpJson.helpFull) if ($.HelpOuts.helpFull.indexOf(m) == -1) $.HelpOuts.helpFull.push(m)
+    }
+    $.helpOut = $.HelpOuts.helpOut
+    $.helpFull = $.HelpOuts.helpFull
+    if (thefs.existsSync(Tuanoutpath)) $.TuanHelptext = thefs.readFileSync(Tuanoutpath, 'utf-8')
+    if ($.TuanHelptext) $.TuanhelpJson = JSON.parse($.TuanHelptext)
+    if (JSON.stringify($.TuanhelpJson) != "{}" && $.TuanhelpJson.thisDay && $.TuanhelpJson.thisDay == $.TuanHelpOuts.thisDay) {
+        if ($.TuanhelpJson.helpOut && $.TuanhelpJson.helpOut.length) for (let n of $.TuanhelpJson.helpOut) if ($.TuanHelpOuts.helpOut.indexOf(n) == -1) $.TuanHelpOuts.helpOut.push(n)
+        if ($.TuanhelpJson.helpFull && $.TuanhelpJson.helpFull.length) for (let m of $.TuanhelpJson.helpFull) if ($.TuanHelpOuts.helpFull.indexOf(m) == -1) $.TuanHelpOuts.helpFull.push(m)
+    }
+    $.TuanhelpOut = $.TuanHelpOuts.helpOut
+    $.TuanhelpFull = $.TuanHelpOuts.helpFull
+    if ($.helpFull.length) {
+        for (let t of $.helpFull) {
+            if (checkArr($.myCodes, t) > -1) $.myCodes.splice(checkArr($.myCodes, t), 1) // 剔除助力已满的助力码
+            if (checkArr($.otherCodes, t) > -1) $.otherCodes.splice(checkArr($.otherCodes, t), 1) // 剔除助力已满的助力码
         }
     }
 }
