@@ -658,7 +658,7 @@ async function turntableFarm(flag = 0) {
                         if ($.browserForTurntableFarmRes && $.browserForTurntableFarmRes.code === '0' && $.browserForTurntableFarmRes.status) {
                             console.log(`第${index + 1}个逛会场任务完成，开始领取水滴奖励\n`)
                             await browserForTurntableFarm(2, $.initForTurntableFarmRes.turntableBrowserAds[index].adId);
-                            if ($.browserForTurntableFarmRes.code === '0') {
+                            if ($.browserForTurntableFarmRes && $.browserForTurntableFarmRes.code === '0') {
                                 console.log(`第${index + 1}个逛会场任务领取水滴奖励完成\n`)
                                 await initForTurntableFarm();
                                 remainLotteryTimes = $.initForTurntableFarmRes.remainLotteryTimes;
