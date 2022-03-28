@@ -95,6 +95,7 @@ let h5st = ''
     }
   }
   if (allMessage) {
+    allMessage = allMessage.replace(/[\s\r\n]+$/g, "")
     if ($.isNode()) await notify.sendNotify(`${$.name}`, `${allMessage}`);
   }
 })()
