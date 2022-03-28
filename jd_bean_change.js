@@ -927,36 +927,32 @@ async function TotalMoney() {
 
 
 function getSign(functionId, body) {
-    return new Promise(async resolve => {
-        let data = {
-            functionId,
-            body: JSON.stringify(body),
-            "client": "apple",
-            "clientVersion": "10.3.0"
-        }
-        let HostArr = ['jdsign.cf', 'signer.nz.lu']
-        let Host = HostArr[Math.floor((Math.random() * HostArr.length))]
-        let options = {
-            url: `https://cdn.nz.lu/ddo`,
+    var strsign = '';
+    let data = {
+        "fn": functionId,
+        "body": body
+    }
+    return new Promise((resolve) => {
+        let url = {
+            url: "https://api.jds.codes/jd/sign",
             body: JSON.stringify(data),
+            followRedirect: false,
             headers: {
-                Host,
-                "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1 Edg/87.0.4280.88"
+                'Accept': '*/*',
+                "accept-encoding": "gzip, deflate, br",
+                'Content-Type': 'application/json',
             },
-            timeout: 30 * 1000
+            timeout: 30000
         }
-        $.post(options, (err, resp, data) => {
+        $.post(url, async (err, resp, data) => {
             try {
-                if (err) {
-                    // console.log(JSON.stringify(err))
-                    console.log(`getSign: API请求失败，请检查网路重试\n`)
-                } else {
+                data = JSON.parse(data);
+                strsign = data.data.sign;
 
-                }
             } catch (e) {
-                $.logErr(e, resp)
+                $.logErr(e, resp);
             } finally {
-                resolve(data);
+                resolve(strsign);
             }
         })
     })
