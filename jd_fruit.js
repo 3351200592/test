@@ -20,23 +20,13 @@ let outpath = './Fruit_HelpOut.json'
 $.HelpOuts = { "thisDay": new Date().getDate(), "helpOut": [], "helpFull": [] }
 $.Helptext = ""
 $.helpJson = {}
-
-if (thefs.existsSync(outpath)) $.Helptext = thefs.readFileSync(outpath, 'utf-8')
-if ($.Helptext) $.helpJson = JSON.parse($.Helptext)
-if (JSON.stringify($.helpJson) != "{}" && $.helpJson.thisDay && $.helpJson.thisDay == $.HelpOuts.thisDay) {
-    if ($.helpJson.helpOut && $.helpJson.helpOut.length) for (let n of $.helpJson.helpOut) if ($.HelpOuts.helpOut.indexOf(n) == -1) $.HelpOuts.helpOut.push(n)
-    if ($.helpJson.helpFull && $.helpJson.helpFull.length) for (let m of $.helpJson.helpFull) if ($.HelpOuts.helpFull.indexOf(m) == -1) $.HelpOuts.helpFull.push(m)
-}
-
-$.helpOut = $.HelpOuts.helpOut
-$.helpFull = $.HelpOuts.helpFull
-
 $.unLogins = []
 $.otherCodes = []
 $.myCodes = []
 $.myFronts = []
 $.helpRunout = []
 $.blackIndexs = []
+
 // 互助环境变量1 设定固定车头助力码、大小写逗号隔开、连续多个可直接用 - 、如：1-10，可混用如：1,2,3,7-15
 let helpFronts = $.isNode() ? (process.env.jd_helpFronts ? process.env.jd_helpFronts : []) : []
 // 互助环境变量2 除了固定互助码放前面被助力 之外的账号 设定随机还是顺序助力，true为随机，false为顺序
@@ -118,12 +108,7 @@ const urlSchema = `openjd://virtual?params=%7B%20%22category%22:%20%22jump%22,%2
 
     console.log(`\n\n***************** 日常任务结束、已用时${parseInt((new Date().getTime() - $.theStart) / 1000)}秒 *****************`)
 
-    if ($.helpFull.length) {
-        for (let t of $.helpFull) {
-            if (checkArr($.myCodes, t) > -1) $.myCodes.splice(checkArr($.myCodes, t), 1) // 剔除助力已满的助力码
-            if (checkArr($.otherCodes, t) > -1) $.otherCodes.splice(checkArr($.otherCodes, t), 1) // 剔除助力已满的助力码
-        }
-    }
+    await getCodesCache()
 
     console.log(`\n\n\n======================= 开始互助 =======================`);
     $.heplTimes = 0
@@ -1650,6 +1635,23 @@ function jsonParse(str) {
             console.log(e);
             $.msg($.name, '', '请勿随意在BoxJs输入框修改内容\n建议通过脚本去获取cookie')
             return [];
+        }
+    }
+}
+
+async function getCodesCache() {
+    if (thefs.existsSync(outpath)) $.Helptext = thefs.readFileSync(outpath, 'utf-8')
+    if ($.Helptext) $.helpJson = JSON.parse($.Helptext)
+    if (JSON.stringify($.helpJson) != "{}" && $.helpJson.thisDay && $.helpJson.thisDay == $.HelpOuts.thisDay) {
+        if ($.helpJson.helpOut && $.helpJson.helpOut.length) for (let n of $.helpJson.helpOut) if ($.HelpOuts.helpOut.indexOf(n) == -1) $.HelpOuts.helpOut.push(n)
+        if ($.helpJson.helpFull && $.helpJson.helpFull.length) for (let m of $.helpJson.helpFull) if ($.HelpOuts.helpFull.indexOf(m) == -1) $.HelpOuts.helpFull.push(m)
+    }
+    $.helpOut = $.HelpOuts.helpOut
+    $.helpFull = $.HelpOuts.helpFull
+    if ($.helpFull.length) {
+        for (let t of $.helpFull) {
+            if (checkArr($.myCodes, t) > -1) $.myCodes.splice(checkArr($.myCodes, t), 1) // 剔除助力已满的助力码
+            if (checkArr($.otherCodes, t) > -1) $.otherCodes.splice(checkArr($.otherCodes, t), 1) // 剔除助力已满的助力码
         }
     }
 }
