@@ -319,7 +319,7 @@ function getSign(functionId, body) {
         $.post(url, async (err, resp, data) => {
             try {
                 if (err) {
-                    console.log(`签到领现金: API请求失败，请检查网路重试\n`)
+                    console.log(`getSign: API请求失败，请检查网路重试\n`)
                 } else {
                     data = JSON.parse(data);
                     strsign = data.data.sign;
