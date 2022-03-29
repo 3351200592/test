@@ -117,6 +117,7 @@ async function appindex(info = false) {
     let functionId = "cash_homePage"
     let body = {}
     let sign = await getSign(functionId, body)
+    if (!sign) return
     return new Promise((resolve) => {
         $.post(apptaskUrl(functionId, sign), async (err, resp, data) => {
             try {
@@ -245,6 +246,7 @@ async function appdoTask(type, taskInfo) {
     let functionId = 'cash_doTask'
     let body = { "type": type, "taskInfo": taskInfo }
     let sign = await getSign(functionId, body)
+    if (!sign) return
     return new Promise((resolve) => {
         $.post(apptaskUrl(functionId, sign), (err, resp, data) => {
             try {
@@ -316,9 +318,12 @@ function getSign(functionId, body) {
         }
         $.post(url, async (err, resp, data) => {
             try {
-                data = JSON.parse(data);
-                strsign = data.data.sign;
-
+                if (err) {
+                    console.log(`签到领现金: API请求失败，请检查网路重试\n`)
+                } else {
+                    data = JSON.parse(data);
+                    strsign = data.data.sign;
+                }
             } catch (e) {
                 $.logErr(e, resp);
             } finally {
