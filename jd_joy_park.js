@@ -107,7 +107,7 @@ async function getJoyBaseInfo(taskId = '', inviteType = '', inviterPin = '', pri
                     console.log(`${$.name} getJoyBaseInfo API请求失败，请检查网路重试`)
                 } else {
                     data = JSON.parse(data);
-                    if (printLog) {
+                    if (printLog && data?.data?.level) {
                         $.log(`等级: ${data.data.level}|金币: ${data.data.joyCoin}`);
                         if (data.data.level >= 30 && $.isNode()) {
                             await notify.sendNotify(`${$.name} - 账号${$.index} - ${$.nickName}`, `【京东账号${$.index}】${$.nickName || $.UserName}\n当前等级: ${data.data.level}\n已达到单次最高等级奖励\n请前往京东极速版APP查看使用优惠券\n活动入口：京东极速版APP->我的->汪汪乐园`);
@@ -136,7 +136,7 @@ function getJoyList(printLog = false) {
                     console.log(`${$.name} API请求失败，请检查网路重试`)
                 } else {
                     data = JSON.parse(data);
-                    if (printLog) {
+                    if (printLog && data?.data) {
                         $.log(`\n===== 【京东账号${$.index}】${$.nickName || $.UserName} joy 状态 start =====`)
                         $.log("在逛街的joy⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️")
 
@@ -257,6 +257,7 @@ async function doJoyMergeAll(activityJoyList) {
     let minLevel = Math.min.apply(Math, activityJoyList.map(o => o.level))
     let joyMinLevelArr = activityJoyList.filter(row => row.level === minLevel);
     let joyBaseInfo = await getJoyBaseInfo();
+    if (!joyBaseInfo) return
     await $.wait(2000)
     if (!joyBaseInfo.fastBuyLevel) {
         await $.wait(5000)
