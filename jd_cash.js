@@ -117,7 +117,7 @@ async function appindex(info = false) {
     let functionId = "cash_homePage"
     let body = {}
     let sign = await getSign(functionId, body)
-    if (!sign) return
+    if (!sign) { console.log(`appindex:获取sign失败`); return }
     return new Promise((resolve) => {
         $.post(apptaskUrl(functionId, sign), async (err, resp, data) => {
             try {
@@ -246,7 +246,7 @@ async function appdoTask(type, taskInfo) {
     let functionId = 'cash_doTask'
     let body = { "type": type, "taskInfo": taskInfo }
     let sign = await getSign(functionId, body)
-    if (!sign) return
+    if (!sign) { console.log(`appdoTask:获取sign失败`); return }
     return new Promise((resolve) => {
         $.post(apptaskUrl(functionId, sign), (err, resp, data) => {
             try {
