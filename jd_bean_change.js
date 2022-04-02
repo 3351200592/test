@@ -953,7 +953,7 @@ function getSign(functionId, body) {
                     console.log(`getSign API请求失败，请检查网路重试`)
                 } else {
                     data = JSON.parse(data);
-                    strsign = data.data.sign || "";
+                    if (data?.data?.sign) strsign = data.data.sign;
                 }
             } catch (e) {
                 $.logErr(e, resp);
