@@ -29,6 +29,7 @@ $.helpRunout = []
 $.blackIndexs = []
 
 let jdSignUrl = '' // 算法url
+let Authorization = '' // 算法url token 有则填
 
 // 互助环境变量1 设定固定车头助力码、大小写逗号隔开、连续多个可直接用 - 、如：1-10，可混用如：1,2,3,7-15
 let helpFronts = $.isNode() ? (process.env.jd_helpFronts ? process.env.jd_helpFronts : []) : []
