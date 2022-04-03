@@ -28,10 +28,14 @@ $.myFronts = []
 $.helpRunout = []
 $.blackIndexs = []
 
+let jdSignUrl = '' // 算法url
+
 // 互助环境变量1 设定固定车头助力码、大小写逗号隔开、连续多个可直接用 - 、如：1-10，可混用如：1,2,3,7-15
 let helpFronts = $.isNode() ? (process.env.jd_helpFronts ? process.env.jd_helpFronts : []) : []
 // 互助环境变量2 除了固定互助码放前面被助力 之外的账号 设定随机还是顺序助力，true为随机，false为顺序
 let helpRandom = $.isNode() ? (process.env.jd_helpRandom ? process.env.jd_helpRandom : false) : false
+
+jdSignUrl = $.isNode() ? (process.env.gua_cleancart_SignUrl ? process.env.gua_cleancart_SignUrl : `${jdSignUrl}`) : ($.getdata('gua_cleancart_SignUrl') ? $.getdata('gua_cleancart_SignUrl') : `${jdSignUrl}`);
 
 if (helpFronts.length > 0) {
     helpFronts = helpFronts.replace(/，/g, ",").replace(/ /g, "").split(",")
@@ -299,15 +303,30 @@ function doTask(type, taskInfo) {
 }
 
 function getSign(functionId, body) {
-    var strsign = '';
-    let data = {
-        "fn": functionId,
-        "body": body
+    let sign = ''
+    let flag = false
+    try {
+        const fs = require('fs');
+        if (fs.existsSync('./gua_encryption_sign.js')) {
+            const encryptionSign = require('./gua_encryption_sign');
+            sign = encryptionSign.getSign(functionId, body)
+        } else {
+            flag = true
+        }
+        sign = sign.data && sign.data.sign && sign.data.sign || ''
+    } catch (e) {
+        flag = true
+    }
+    if (!flag) return sign
+    if (!jdSignUrl.match(/^https?:\/\//)) {
+        console.log('请填写算法url')
+        $.out = true
+        return ''
     }
     return new Promise((resolve) => {
-        let url = {
-            url: "https://api.jds.codes/jd/sign",
-            body: JSON.stringify(data),
+        let options = {
+            url: jdSignUrl,
+            body: `{"fn":"${functionId}","body":${body}}`,
             followRedirect: false,
             headers: {
                 'Accept': '*/*',
@@ -316,18 +335,25 @@ function getSign(functionId, body) {
             },
             timeout: 30000
         }
-        $.post(url, async (err, resp, data) => {
+        if (Authorization) options["headers"]["Authorization"] = Authorization
+        $.post(options, async (err, resp, data) => {
             try {
-                if (err) {
-                    console.log(`getSign: API请求失败，请检查网路重试\n`)
+                // console.log(data)
+                let res = $.toObj(data, data)
+                if (typeof res === 'object' && res) {
+                    if (res.code && res.code == 200 && res.data) {
+                        if (res.data.sign) sign = res.data.sign || ''
+                        if (sign != '') resolve(sign)
+                    } else {
+                        console.log(data)
+                    }
                 } else {
-                    data = JSON.parse(data);
-                    if (data?.data?.sign) strsign = data.data.sign;
+                    console.log(data)
                 }
             } catch (e) {
                 $.logErr(e, resp);
             } finally {
-                resolve(strsign);
+                resolve('')
             }
         })
     })
