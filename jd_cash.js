@@ -341,8 +341,7 @@ function getSign(functionId, body) {
         if (Authorization) options["headers"]["Authorization"] = Authorization
         $.post(options, async (err, resp, data) => {
             try {
-                 console.log(data)
-
+                // console.log(data)
                 let res = $.toObj(data, data)
                 if (typeof res === 'object' && res) {
                     if (res.code && res.code == 200 && res.data) {
