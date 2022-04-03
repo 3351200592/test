@@ -21,6 +21,9 @@ let ReturnMessage = '';
 let cookiesArr = [], cookie = '';
 const JD_API_HOST = 'https://api.m.jd.com/client.action';
 
+let jdSignUrl = '' // 算法url
+let Authorization = '' // 算法url token 有则填
+
 if ($.isNode()) {
     Object.keys(jdCookieNode).forEach((item) => {
         cookiesArr.push(jdCookieNode[item])
@@ -29,6 +32,11 @@ if ($.isNode()) {
 } else {
     cookiesArr = [$.getdata('CookieJD'), $.getdata('CookieJD2'), ...jsonParse($.getdata('CookiesJD') || "[]").map(item => item.cookie)].filter(item => !!item);
 }
+
+jdSignUrl = $.isNode() ? (process.env.gua_cleancart_SignUrl ? process.env.gua_cleancart_SignUrl : `${jdSignUrl}`) : ($.getdata('gua_cleancart_SignUrl') ? $.getdata('gua_cleancart_SignUrl') : `${jdSignUrl}`);
+Authorization = process.env.gua_cleancart_Authorization ? process.env.gua_cleancart_Authorization : `${Authorization}`
+if (Authorization && Authorization.indexOf("Bearer ") === -1) Authorization = `Bearer ${Authorization}`
+
 !(async () => {
     if (!cookiesArr[0]) {
         $.msg($.name, '【提示】请先获取京东账号一cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/bean/signIndex.action', { "open-url": "https://bean.m.jd.com/bean/signIndex.action" });
@@ -929,15 +937,30 @@ async function TotalMoney() {
 
 
 function getSign(functionId, body) {
-    var strsign = '';
-    let data = {
-        "fn": functionId,
-        "body": body
+    let sign = ''
+    let flag = false
+    try {
+        const fs = require('fs');
+        if (fs.existsSync('./gua_encryption_sign.js')) {
+            const encryptionSign = require('./gua_encryption_sign');
+            sign = encryptionSign.getSign(functionId, body)
+        } else {
+            flag = true
+        }
+        sign = sign.data && sign.data.sign && sign.data.sign || ''
+    } catch (e) {
+        flag = true
+    }
+    if (!flag) return sign
+    if (!jdSignUrl.match(/^https?:\/\//)) {
+        console.log('请填写算法url')
+        $.out = true
+        return ''
     }
     return new Promise((resolve) => {
-        let url = {
-            url: "https://api.jds.codes/jd/sign",
-            body: JSON.stringify(data),
+        let options = {
+            url: jdSignUrl,
+            body: JSON.stringify({"fn":functionId,"body": body}),
             followRedirect: false,
             headers: {
                 'Accept': '*/*',
@@ -946,19 +969,30 @@ function getSign(functionId, body) {
             },
             timeout: 30000
         }
-        $.post(url, async (err, resp, data) => {
+        if (Authorization) options["headers"]["Authorization"] = Authorization
+        $.post(options, async (err, resp, data) => {
             try {
+                // console.log(data)
                 if (err) {
                     $.hasSign = false
                     console.log(`getSign API请求失败，请检查网路重试`)
                 } else {
-                    data = JSON.parse(data);
-                    if (data?.data?.sign) strsign = data.data.sign;
+                    let res = $.toObj(data, data)
+                    if (typeof res === 'object' && res) {
+                        if (res.code && res.code == 200 && res.data) {
+                            if (res.data.sign) sign = res.data.sign || ''
+                            if (sign != '') resolve(sign)
+                        } else {
+                            console.log(data)
+                        }
+                    } else {
+                        console.log(data)
+                    }
                 }
             } catch (e) {
                 $.logErr(e, resp);
             } finally {
-                resolve(strsign);
+                resolve('')
             }
         })
     })
