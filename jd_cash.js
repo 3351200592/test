@@ -37,6 +37,8 @@ let helpFronts = $.isNode() ? (process.env.jd_helpFronts ? process.env.jd_helpFr
 let helpRandom = $.isNode() ? (process.env.jd_helpRandom ? process.env.jd_helpRandom : false) : false
 
 jdSignUrl = $.isNode() ? (process.env.gua_cleancart_SignUrl ? process.env.gua_cleancart_SignUrl : `${jdSignUrl}`) : ($.getdata('gua_cleancart_SignUrl') ? $.getdata('gua_cleancart_SignUrl') : `${jdSignUrl}`);
+Authorization = process.env.gua_cleancart_Authorization ? process.env.gua_cleancart_Authorization : `${Authorization}`
+if (Authorization && Authorization.indexOf("Bearer ") === -1) Authorization = `Bearer ${Authorization}`
 
 if (helpFronts.length > 0) {
     helpFronts = helpFronts.replace(/，/g, ",").replace(/ /g, "").split(",")
