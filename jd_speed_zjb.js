@@ -142,7 +142,7 @@ function help() {
                 let res = $.toObj(data, data)
                 if (typeof res == 'object') {
                     if (res.code == 0) {
-                        console.log(`接受邀请获得: ` + res.data.coinReward + "金币")
+                        console.log(`接受邀请成功, 获得${res.data.coinReward}金币`)
                     } else {
                         if (res.message) console.log(res.message)
                         else console.log(data)
