@@ -204,6 +204,8 @@
 6 5,11,17 * * * node /scripts/jd_beauty.js >> /scripts/logs/jd_beauty.log 2>&1
 #京东保价
 9 12,23 * * * node /scripts/jd_price.js >> /scripts/logs/jd_price.log 2>&1
+#京东极速版邀请赚金币
+1 0,1,15 * * * node /scripts/jd_speed_zjb.js >> /scripts/logs/jd_speed_zjb.log 2>&1
 #京东极速版签到+赚现金任务
 13 1,15 * * * node /scripts/jd_speed_sign.js >> /scripts/logs/jd_speed_sign.log 2>&1
 # 删除优惠券(默认注释，如需要自己开启，如有误删，已删除的券可以在回收站中还原，慎用)
