@@ -448,20 +448,22 @@ async function getFirstWaterAward() {
 //领取十次浇水奖励
 async function getTenWaterAward() {
     //领取10次浇水奖励
-    if (!$.farmTask.totalWaterTaskInit.f && $.farmTask.totalWaterTaskInit.totalWaterTaskTimes >= $.farmTask.totalWaterTaskInit.totalWaterTaskLimit) {
-        await totalWaterTaskForFarm();
-        if ($.totalWaterReward && $.totalWaterReward.code === '0') {
-            console.log(`【十次浇水奖励】获得${$.totalWaterReward.totalWaterTaskEnergy}g💧\n`);
-            // message += `【十次浇水奖励】获得${$.totalWaterReward.totalWaterTaskEnergy}g💧\n`;
-        } else {
-            // message += '【十次浇水奖励】领取奖励失败,详询日志\n';
-            console.log(`领取10次浇水奖励结果:  ${JSON.stringify($.totalWaterReward)}`);
+    if ($.farmTask) {
+        if (!$.farmTask.totalWaterTaskInit.f && $.farmTask.totalWaterTaskInit.totalWaterTaskTimes >= $.farmTask.totalWaterTaskInit.totalWaterTaskLimit) {
+            await totalWaterTaskForFarm();
+            if ($.totalWaterReward && $.totalWaterReward.code === '0') {
+                console.log(`【十次浇水奖励】获得${$.totalWaterReward.totalWaterTaskEnergy}g💧\n`);
+                // message += `【十次浇水奖励】获得${$.totalWaterReward.totalWaterTaskEnergy}g💧\n`;
+            } else {
+                // message += '【十次浇水奖励】领取奖励失败,详询日志\n';
+                console.log(`领取10次浇水奖励结果:  ${JSON.stringify($.totalWaterReward)}`);
+            }
+        } else if ($.farmTask.totalWaterTaskInit.totalWaterTaskTimes < $.farmTask.totalWaterTaskInit.totalWaterTaskLimit) {
+            // message += `【十次浇水奖励】任务未完成，今日浇水${$.farmTask.totalWaterTaskInit.totalWaterTaskTimes}次\n`;
+            console.log(`【十次浇水奖励】任务未完成，今日浇水${$.farmTask.totalWaterTaskInit.totalWaterTaskTimes}次\n`);
         }
-    } else if ($.farmTask.totalWaterTaskInit.totalWaterTaskTimes < $.farmTask.totalWaterTaskInit.totalWaterTaskLimit) {
-        // message += `【十次浇水奖励】任务未完成，今日浇水${$.farmTask.totalWaterTaskInit.totalWaterTaskTimes}次\n`;
-        console.log(`【十次浇水奖励】任务未完成，今日浇水${$.farmTask.totalWaterTaskInit.totalWaterTaskTimes}次\n`);
+        console.log('finished 水果任务完成!');
     }
-    console.log('finished 水果任务完成!');
 }
 
 //再次浇水
