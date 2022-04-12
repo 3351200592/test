@@ -480,7 +480,7 @@ function getGameMyPrize() {
                                 await notify.sendNotify(`${$.name} - 账号${$.index} - ${$.nickName}`, `【京东账号${$.index}】${$.nickName || $.UserName}\n当前等级: ${$.topLevel}\n已达到单次最高等级奖励\n请到京东极速版APP领取奖励并解锁新场景\n活动入口：京东极速版APP->我的->汪汪乐园`);
                                 if (thefs.existsSync(thepath) && notifyTip) {
                                     let thenotify = require(thepath)
-                                    await thenotify.sendNotify(`${$.name} - 账号${$.index} - ${$.nickName}`, `【京东账号${$.index}】${$.nickName || $.UserName}\n当前等级: ${data.data.level}\n已达到单次最高等级奖励\n请到京东极速版APP领取奖励并解锁新场景\n活动入口：京东极速版APP->我的->汪汪乐园`);
+                                    await thenotify.sendNotify(`${$.name} - 账号${$.index} - ${$.nickName}`, `【京东账号${$.index}】${$.nickName || $.UserName}\n当前等级: ${$.topLevel}\n已达到单次最高等级奖励\n请到京东极速版APP领取奖励并解锁新场景\n活动入口：京东极速版APP->我的->汪汪乐园`);
                                 }
                                 $.notifyTop = true
                             }
