@@ -80,6 +80,10 @@ message = ""
         $.activityJoyList = []
         $.workJoyInfoList = []
         await getJoyList(true);
+        if (!$.activityJoyList.length || !$.workJoyInfoList.length) {
+            console.log(`信息获取失败`);
+            continue
+        }
         await getGameShopList()
         //清理工位
         await doJoyMoveDownAll($.workJoyInfoList)
@@ -156,8 +160,8 @@ function getJoyList(printLog = false) {
                         }
                         $.log(`===== 【京东账号${$.index}】${$.nickName || $.UserName} joy 状态  end  =====\n`)
                     }
-                    $.activityJoyList = data.data.activityJoyList
-                    $.workJoyInfoList = data.data.workJoyInfoList
+                    $.activityJoyList = data?.data?.activityJoyList || []
+                    $.workJoyInfoList = data?.data?.workJoyInfoList || []
                 }
             } catch (e) {
                 $.logErr(e, resp)
