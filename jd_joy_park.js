@@ -32,8 +32,6 @@ if ($.isNode()) {
     cookiesArr = [$.getdata('CookieJD'), $.getdata('CookieJD2'), ...jsonParse($.getdata('CookiesJD') || "[]").map(item => item.cookie)].filter(item => !!item);
 }
 
-cookiesArr = ["pt_key=AAJiR70SADDqgJjxifVheb_tUKhJO65hnqpZeFBWBS6Emzrc1bBY7fLkF-eapM0PlGDrVy7dB9Y;pt_pin=jd_564ed7b5a9174;"]
-
 //最大化硬币收益模式
 $.JOY_COIN_MAXIMIZE = process.env.JOY_COIN_MAXIMIZE === '1'
 $.log(`最大化收益模式: 已${$.JOY_COIN_MAXIMIZE ? `默认开启` : `关闭`}  `)
