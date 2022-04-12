@@ -252,7 +252,10 @@ async function joyCoinMaximize(workJoyInfoUnlockList) {
 }
 
 async function doJoyMoveDownAll(workJoyInfoList) {
-    if (workJoyInfoList.filter(row => row.joyDTO).length === 0) {
+    if (!workJoyInfoList.length) {
+        $.log(`信息获取失败、未开启活动 或 未解锁新场景 或 黑号了`)
+        return   
+    } else if (workJoyInfoList.filter(row => row.joyDTO).length === 0) {
         $.log(`工位清理完成！`)
         return true
     }
