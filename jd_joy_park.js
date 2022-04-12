@@ -19,6 +19,10 @@ const notify = $.isNode() ? require('./sendNotify') : '';
 let cookiesArr = [], cookie = '';
 let hotFlag = false;
 
+const thefs = require('fs');
+const thepath = '/jd/scripts/0sendNotify_Annyooo.js'
+const notifyTip = $.isNode() ? process.env.MY_NOTIFYTIP : false;
+
 if ($.isNode()) {
     Object.keys(jdCookieNode).forEach((item) => {
         cookiesArr.push(jdCookieNode[item])
@@ -27,6 +31,8 @@ if ($.isNode()) {
 } else {
     cookiesArr = [$.getdata('CookieJD'), $.getdata('CookieJD2'), ...jsonParse($.getdata('CookiesJD') || "[]").map(item => item.cookie)].filter(item => !!item);
 }
+
+cookiesArr = ["pt_key=AAJiR70SADDqgJjxifVheb_tUKhJO65hnqpZeFBWBS6Emzrc1bBY7fLkF-eapM0PlGDrVy7dB9Y;pt_pin=jd_564ed7b5a9174;"]
 
 //最大化硬币收益模式
 $.JOY_COIN_MAXIMIZE = process.env.JOY_COIN_MAXIMIZE === '1'
@@ -76,14 +82,11 @@ message = ""
         }
         //下地后还有有钱买Joy并且买了Joy
         $.hasJoyCoin = true
+        $.notifyTop = false
         await getJoyBaseInfo(undefined, undefined, undefined, true);
         $.activityJoyList = []
         $.workJoyInfoList = []
         await getJoyList(true);
-        if (!$.activityJoyList.length || !$.workJoyInfoList.length) {
-            console.log(`信息获取失败`);
-            continue
-        }
         await getGameShopList()
         //清理工位
         await doJoyMoveDownAll($.workJoyInfoList)
@@ -113,8 +116,13 @@ async function getJoyBaseInfo(taskId = '', inviteType = '', inviterPin = '', pri
                     data = JSON.parse(data);
                     if (printLog && data?.data?.level) {
                         $.log(`等级: ${data.data.level}|金币: ${data.data.joyCoin}`);
-                        if (data.data.level >= 30 && $.isNode()) {
-                            await notify.sendNotify(`${$.name} - 账号${$.index} - ${$.nickName}`, `【京东账号${$.index}】${$.nickName || $.UserName}\n当前等级: ${data.data.level}\n已达到单次最高等级奖励\n请前往京东极速版APP查看使用优惠券\n活动入口：京东极速版APP->我的->汪汪乐园`);
+                        if (data.data.level >= 30 && $.isNode() && !$.notifyTop) {
+                            await notify.sendNotify(`${$.name} - 账号${$.index} - ${$.nickName}`, `【京东账号${$.index}】${$.nickName || $.UserName}\n当前等级: ${data.data.level}\n已达到单次最高等级奖励\n请到京东极速版APP领取奖励并解锁新场景\n活动入口：京东极速版APP->我的->汪汪乐园`);
+                            if (thefs.existsSync(thepath) && notifyTip) {
+                                let thenotify = require(thepath)
+                                await thenotify.sendNotify(`${$.name} - 账号${$.index} - ${$.nickName}`, `【京东账号${$.index}】${$.nickName || $.UserName}\n当前等级: ${data.data.level}\n已达到单次最高等级奖励\n请到京东极速版APP领取奖励并解锁新场景\n活动入口：京东极速版APP->我的->汪汪乐园`);
+                            }
+                            $.notifyTop = true;
                             //$.log(`\n开始解锁新场景...\n`);
                             //await doJoyRestart()
                         }
@@ -147,8 +155,13 @@ function getJoyList(printLog = false) {
                         for (let i = 0; i < data.data.activityJoyList.length; i++) {
                             //$.wait(50);
                             $.log(`id:${data.data.activityJoyList[i].id}|name: ${data.data.activityJoyList[i].name}|level: ${data.data.activityJoyList[i].level}`);
-                            if (data.data.activityJoyList[i].level >= 30 && $.isNode()) {
-                                await notify.sendNotify(`${$.name} - 账号${$.index} - ${$.nickName}`, `【京东账号${$.index}】${$.nickName || $.UserName}\n当前等级: ${data.data.level}\n已达到单次最高等级奖励\n请尽快前往活动查看领取\n活动入口：京东极速版APP->汪汪乐园\n`);
+                            if (data.data.activityJoyList[i].level >= 30 && $.isNode() && !$.notifyTop) {
+                                await notify.sendNotify(`${$.name} - 账号${$.index} - ${$.nickName}`, `【京东账号${$.index}】${$.nickName || $.UserName}\n当前等级: ${data.data.level}\n已达到单次最高等级奖励\n请到京东极速版APP领取奖励并解锁新场景\n活动入口：京东极速版APP->我的->汪汪乐园\n`);
+                                if (thefs.existsSync(thepath) && notifyTip) {
+                                    let thenotify = require(thepath)
+                                    await thenotify.sendNotify(`${$.name} - 账号${$.index} - ${$.nickName}`, `【京东账号${$.index}】${$.nickName || $.UserName}\n当前等级: ${data.data.level}\n已达到单次最高等级奖励\n请到京东极速版APP领取奖励并解锁新场景\n活动入口：京东极速版APP->我的->汪汪乐园`);
+                                }
+                                $.notifyTop = true;
                                 //$.log(`\n开始解锁新场景...\n`);
                                 //await doJoyRestart()
                             }
@@ -456,6 +469,29 @@ function getGameMyPrize() {
                                 $.poolBaseId = $.Vos[i].prizeTypeVO.poolBaseId
                                 $.prizeGroupId = $.Vos[i].prizeTypeVO.prizeGroupId
                                 $.prizeBaseId = $.Vos[i].prizeTypeVO.prizeBaseId
+                                await apCashWithDraw($.id, $.poolBaseId, $.prizeGroupId, $.prizeBaseId)
+                            }
+                        }
+
+                        $.BigVO = data?.data?.gameBigPrizeVO || ""
+                        $.topStatus = data?.data?.gameBigPrizeVO?.topLevelStatus || 0
+                        $.topLevel = data?.data?.gameBigPrizeVO?.level || 0
+                        if ($.BigVO && $.topStatus == 1 && $.topLevel == 30) {
+                            if ($.isNode() && !$.notifyTop) {
+                                console.log(`当前账号已达最高等级: ${data.data.gameBigPrizeVO.level}级`)
+                                await notify.sendNotify(`${$.name} - 账号${$.index} - ${$.nickName}`, `【京东账号${$.index}】${$.nickName || $.UserName}\n当前等级: ${$.topLevel}\n已达到单次最高等级奖励\n请到京东极速版APP领取奖励并解锁新场景\n活动入口：京东极速版APP->我的->汪汪乐园`);
+                                if (thefs.existsSync(thepath) && notifyTip) {
+                                    let thenotify = require(thepath)
+                                    await thenotify.sendNotify(`${$.name} - 账号${$.index} - ${$.nickName}`, `【京东账号${$.index}】${$.nickName || $.UserName}\n当前等级: ${data.data.level}\n已达到单次最高等级奖励\n请到京东极速版APP领取奖励并解锁新场景\n活动入口：京东极速版APP->我的->汪汪乐园`);
+                                }
+                                $.notifyTop = true
+                            }
+                            if (data.data.gameBigPrizeVO.prizeType == 4 && data.data.gameBigPrizeVO.prizeTypeVO.prizeUsed == 0) {
+                                $.log(`\n当前账号有【${data.data.gameBigPrizeVO.prizeTypeVO.prizeValue}元微信现金】可提现`)
+                                $.id = data.data.gameBigPrizeVO.prizeTypeVO.id
+                                $.poolBaseId = data.data.gameBigPrizeVO.prizeTypeVO.poolBaseId
+                                $.prizeGroupId = data.data.gameBigPrizeVO.prizeTypeVO.prizeGroupId
+                                $.prizeBaseId = data.data.gameBigPrizeVO.prizeTypeVO.prizeBaseId
                                 await apCashWithDraw($.id, $.poolBaseId, $.prizeGroupId, $.prizeBaseId)
                             }
                         }
