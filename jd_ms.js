@@ -63,7 +63,7 @@ const JD_API_HOST = 'https://api.m.jd.com/client.action';
         }
         continue
       }
-      await tttsign()
+      // await tttsign()
       await jdMs()
     }
   }
@@ -124,7 +124,7 @@ function getUserInfo(info=true) {
         } else {
           if (safeGet(data)) {
             data = JSON.parse(data)
-            if (data.code === 2041 || data.code === 2042) {
+            if (data?.result?.assignment?.assignmentPoints || data.code === 2060) {
               $.score = data.result.assignment.assignmentPoints || 0
               if(info) console.log(`当前秒秒币${$.score}`)
             }
