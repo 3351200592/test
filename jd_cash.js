@@ -109,6 +109,7 @@ let allMessage = '';
 
 async function jdCash() {
     $.signMoney = 0;
+    await cashSign()
     await appindex()
     await index()
     await shareCodesFormat()
@@ -118,6 +119,33 @@ async function jdCash() {
     $.exchangeBeanNum = 0;
     cash_exchange = $.isNode() ? (process.env.CASH_EXCHANGE ? process.env.CASH_EXCHANGE : `${cash_exchange}`) : ($.getdata('cash_exchange') ? $.getdata('cash_exchange') : `${cash_exchange}`);
     await appindex(true)
+}
+
+function cashSign() {
+    return new Promise((resolve) => {
+        $.get(taskUrl("cash_mob_sign", { "breakReward": 1 }), (err, resp, data) => {
+            try {
+                if (err) {
+                    console.log(`${JSON.stringify(err)}`)
+                    console.log(`cash_mob_sign API请求失败，请检查网路重试`)
+                } else {
+                    if (safeGet(data)) {
+                        data = JSON.parse(data);
+                        // console.log(data);
+                        if (data?.data?.bizCode === 0) {
+                            console.log(`签到${data.data.bizMsg}\n`)
+                        } else {
+                            console.log(`${data?.data?.bizMsg || data}\n`)
+                        }
+                    }
+                }
+            } catch (e) {
+                $.logErr(e, resp)
+            } finally {
+                resolve();
+            }
+        })
+    })
 }
 
 async function appindex(info = false) {
@@ -140,7 +168,7 @@ async function appindex(info = false) {
                                     message += `当前现金：${data.data.result.totalMoney}元`;
                                     allMessage += `京东账号${$.index}${$.nickName}\n${message}${$.index !== cookiesArr.length ? '\n\n' : ''}`;
                                 }
-                                console.log(`\n【京东账号${$.index}】当前现金：${data.data.result.totalMoney}元`);
+                                console.log(`【京东账号${$.index}】当前现金：${data.data.result.totalMoney}元`);
                                 return
                             }
                             $.signMoney = data.data.result.totalMoney;
@@ -329,7 +357,7 @@ function getSign(functionId, body) {
     return new Promise((resolve) => {
         let options = {
             url: jdSignUrl,
-            body: JSON.stringify({"fn":functionId,"body": body}),
+            body: JSON.stringify({ "fn": functionId, "body": body }),
             followRedirect: false,
             headers: {
                 'Accept': '*/*',
