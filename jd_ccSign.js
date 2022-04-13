@@ -162,6 +162,7 @@ function getSign(functionid, body) {
             },
             timeout: 30000
         }
+        if (Authorization) options["headers"]["Authorization"] = Authorization
         $.post(options, (err, resp, data) => {
             try {
                 if (err) {
