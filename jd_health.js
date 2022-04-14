@@ -26,6 +26,7 @@ $.myFronts = []
 $.helpRunout = []
 $.blackIndexs = []
 
+let taskList = []
 // 互助环境变量1 设定固定车头助力码、大小写逗号隔开、连续多个可直接用 - 、如：1-10，可混用如：1,2,3,7-15
 let helpFronts = $.isNode() ? (process.env.jd_helpFronts ? process.env.jd_helpFronts : []) : []
 // 互助环境变量2 除了固定互助码放前面被助力 之外的账号 设定随机还是顺序助力，true为随机，false为顺序
@@ -147,23 +148,24 @@ async function main() {
         $.score = 0
         $.earn = false
         $.isHuobao = false
+        taskList = []
         await getTaskDetail(-1)
         if ($.isHuobao) return
-        await getTaskDetail(16)
-        await getTaskDetail(6)
-        for (let i = 0; i < 5; ++i) {
-            $.canDo = false
-            await getTaskDetail()
-            if (!$.canDo) break
+        await getTaskDetail(16) //签到
+        await getTaskDetail(6)  //助力
+        //日常任务
+        for (let i = 0; i < taskList.length; i++) {
+            // $.canDo = false
+            if (taskList[i].status) {
+                await getTaskDetail(taskList[i].taskId)
+            } else console.log(`今天没有${taskList[i].taskName}这个任务`)
+            // if (!$.canDo) break
             await $.wait(1000)
         }
         await collectScore()
-        // await getTaskDetail(22);
-        await getTaskDetail(-1)
-
         if (reward) await getCommodities()
-
         await doLottery()
+        await getTaskDetail(-1) //获取本次任务获得健康值
 
     } catch (e) {
         $.logErr(e)
@@ -237,6 +239,7 @@ function getTaskDetail(taskId = '') {
                                 $.earn = tmp - $.score
                                 $.score = tmp
                             }
+                            taskList = data.data.result.taskVos
                         } else if (taskId === 6) {
                             if (data?.data?.result?.taskVos) {
                                 $.thisCode = data?.data?.result?.taskVos[0].assistTaskDetailVo.taskToken
