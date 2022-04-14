@@ -132,7 +132,7 @@ function cashSign() {
                     if (safeGet(data)) {
                         data = JSON.parse(data);
                         // console.log(data);
-                        if (data?.data?.bizCode === 0) {
+                        if (data?.data?.bizMsg && data.data.bizCode == 0) {
                             console.log(`签到${data.data.bizMsg}\n`)
                         } else {
                             console.log(`${data?.data?.bizMsg || data}\n`)
