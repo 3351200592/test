@@ -262,7 +262,7 @@ function getTaskDetail(taskId = '') {
                         } else {
                             for (let vo of data?.data?.result?.taskVos.filter(vo => vo.taskType !== 19) ?? []) {
                                 console.log(`${vo.taskName}任务，完成次数：${vo.times}/${vo.maxTimes}`)
-                                for (let i = vo.times; i < vo.maxTimes; i++) {
+                                for (let i = vo.maxTimes - vo.times - 1; i >= 0; i--) {
                                     console.log(`去完成${vo.taskName}任务`)
                                     // console.log(vo)
                                     if (vo.taskType === 13) {
@@ -272,13 +272,13 @@ function getTaskDetail(taskId = '') {
                                         await $.wait(1000 * 10)
                                         await doTask(vo.productInfoVos[i]?.taskToken, vo?.taskId, 0)
                                     } else if (vo.taskType === 9) {
-                                        await doTask(vo.shoppingActivityVos[0]?.taskToken, vo?.taskId, 1)
+                                        await doTask(vo.shoppingActivityVos[i]?.taskToken, vo?.taskId, 1)
                                         await $.wait(1000 * 10)
-                                        await doTask(vo.shoppingActivityVos[0]?.taskToken, vo?.taskId, 0)
+                                        await doTask(vo.shoppingActivityVos[i]?.taskToken, vo?.taskId, 0)
                                     } else if (vo.taskType === 10) {
-                                        await doTask(vo.threeMealInfoVos[0]?.taskToken, vo?.taskId)
+                                        await doTask(vo.threeMealInfoVos[i]?.taskToken, vo?.taskId)
                                     } else if (vo.taskType === 26 || vo.taskType === 3) {
-                                        await doTask(vo.shoppingActivityVos[0]?.taskToken, vo?.taskId)
+                                        await doTask(vo.shoppingActivityVos[i]?.taskToken, vo?.taskId)
                                     }
                                     else if (vo.taskType === 1) {
                                         for (let key of Object.keys(vo.followShopVo)) {
