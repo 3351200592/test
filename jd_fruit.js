@@ -248,17 +248,19 @@ async function doDailyTask() {
     await taskInitForFarm();
     console.log(`开始签到`);
     if (!$.farmTask) return
-    if (!$.farmTask.signInit.todaySigned) {
-        await signForFarm(); //签到
-        if ($.signResult && $.signResult.code === "0") {
-            console.log(`【签到成功】获得${$.signResult.amount}g💧`)
-            //message += `【签到成功】获得${$.signResult.amount}g💧\n`//连续签到${signResult.signDay}天
+    if ($.farmTask.signInit) {
+        if (!$.farmTask.signInit.todaySigned) {
+            await signForFarm(); //签到
+            if ($.signResult && $.signResult.code === "0") {
+                console.log(`【签到成功】获得${$.signResult.amount}g💧`)
+                //message += `【签到成功】获得${$.signResult.amount}g💧\n`//连续签到${signResult.signDay}天
+            } else {
+                // message += `签到失败,详询日志\n`;
+                console.log(`签到结果:  ${JSON.stringify($.signResult)}`);
+            }
         } else {
-            // message += `签到失败,详询日志\n`;
-            console.log(`签到结果:  ${JSON.stringify($.signResult)}`);
+            console.log(`今天已签到,连续签到${$.farmTask.signInit.totalSigned},下次签到可得${$.farmTask.signInit.signEnergyEachAmount}g\n`);
         }
-    } else {
-        console.log(`今天已签到,连续签到${$.farmTask.signInit.totalSigned},下次签到可得${$.farmTask.signInit.signEnergyEachAmount}g\n`);
     }
     // 被水滴砸中
     console.log(`被水滴砸中： ${$.farmInfo.todayGotWaterGoalTask.canPop ? '是' : '否'}`);
@@ -1084,22 +1086,23 @@ async function doFriendsWater() {
 //领取给3个好友浇水后的奖励水滴
 async function getWaterFriendGotAward() {
     await taskInitForFarm();
-    if (!$.farmTask) return
-    const { waterFriendCountKey, waterFriendMax, waterFriendSendWater, waterFriendGotAward } = $.farmTask.waterFriendTaskInit
-    if (waterFriendCountKey >= waterFriendMax) {
-        if (!waterFriendGotAward) {
-            await waterFriendGotAwardForFarm();
-            console.log(`领取给${waterFriendMax}个好友浇水后的奖励水滴::${JSON.stringify($.waterFriendGotAwardRes)}`)
-            if ($.waterFriendGotAwardRes && $.waterFriendGotAwardRes.code === '0') {
-                // message += `【给${waterFriendMax}好友浇水】奖励${$.waterFriendGotAwardRes.addWater}g水滴\n`;
-                console.log(`【给${waterFriendMax}好友浇水】奖励${$.waterFriendGotAwardRes.addWater}g水滴\n`);
+    if ($.farmTask?.waterFriendTaskInit) {
+        const { waterFriendCountKey, waterFriendMax, waterFriendSendWater, waterFriendGotAward } = $.farmTask.waterFriendTaskInit
+        if (waterFriendCountKey >= waterFriendMax) {
+            if (!waterFriendGotAward) {
+                await waterFriendGotAwardForFarm();
+                console.log(`领取给${waterFriendMax}个好友浇水后的奖励水滴::${JSON.stringify($.waterFriendGotAwardRes)}`)
+                if ($.waterFriendGotAwardRes && $.waterFriendGotAwardRes.code === '0') {
+                    // message += `【给${waterFriendMax}好友浇水】奖励${$.waterFriendGotAwardRes.addWater}g水滴\n`;
+                    console.log(`【给${waterFriendMax}好友浇水】奖励${$.waterFriendGotAwardRes.addWater}g水滴\n`);
+                }
+            } else {
+                console.log(`给好友浇水的${waterFriendSendWater}g水滴奖励已领取\n`);
+                // message += `【给${waterFriendMax}好友浇水】奖励${waterFriendSendWater}g水滴已领取\n`;
             }
         } else {
-            console.log(`给好友浇水的${waterFriendSendWater}g水滴奖励已领取\n`);
-            // message += `【给${waterFriendMax}好友浇水】奖励${waterFriendSendWater}g水滴已领取\n`;
+            console.log(`暂未给${waterFriendMax}个好友浇水\n`);
         }
-    } else {
-        console.log(`暂未给${waterFriendMax}个好友浇水\n`);
     }
 }
 
