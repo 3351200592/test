@@ -51,6 +51,7 @@ $.appId = 10032;
 我把它放在一个神奇的岛屿
 去找吧
 `)
+  $.pearlEnd = false
   await requestAlgo();
   for (let i = 0; i < cookiesArr.length; i++) {
     if (cookiesArr[i]) {
@@ -114,7 +115,7 @@ async function run() {
     // 导游
     await Guide()
     // 撸珍珠
-    await Pearl()
+    if (!$.pearlEnd) await Pearl()
     // 牛牛任务
     await ActTask()
     // 日常任务、成就任务
@@ -653,6 +654,12 @@ async function Pearl(){
   try{
     await $.wait(2000)
     $.ComposeGameState = await taskGet(`user/ComposePearlState`, '', '&dwGetType=0')
+    if (!$.ComposeGameState) return
+    if ($.ComposeGameState.iRet == "2240" || $.ComposeGameState.sErrMsg.indexOf("暂未开放") > -1) {
+      console.log("\n撸珍珠活动未开放")
+      $.pearlEnd = true
+      return
+    }
     console.log(`\n当前有${$.ComposeGameState.dwCurProgress}个珍珠${$.ComposeGameState.ddwVirHb && ' '+$.ComposeGameState.ddwVirHb/100+"红包" || ''}`)
     if($.ComposeGameState.dayDrawInfo.dwIsDraw == 0){
       let res = ''
@@ -985,7 +992,7 @@ function getGetRequest(type, stk='', additional='') {
       "Accept-Encoding": "gzip, deflate, br",
       "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
       "Connection": "keep-alive",
-      'Cookie': $.cookie,
+      'Cookie': `cid=4;${$.cookie}`,
       'Host': 'm.jingxi.com',
       "Referer": "https://st.jingxi.com/",
       "User-Agent": UA,
@@ -1003,7 +1010,7 @@ function biz(contents){
         "Accept-Encoding": "gzip, deflate, br",
         "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
         "Connection": "keep-alive",
-        'Cookie': $.cookie,
+        'Cookie': `cid=4;${$.cookie}`,
         'Host': 'm.jingxi.com',
         "Referer": "https://st.jingxi.com/",
         "User-Agent": UA,
