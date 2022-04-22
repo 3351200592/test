@@ -159,6 +159,7 @@ async function jdPlantBean() {
         if (!$.plantBeanIndexResult) return
         if ($.plantBeanIndexResult.errorCode === 'PB101') {
             console.log(`\n活动太火爆了，还是去买买买吧！\n`)
+            if (!$.blackIndexs.includes($.index)) $.blackIndexs.push($.index)
             return
         }
         if ($.plantBeanIndexResult.data) {
