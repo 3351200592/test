@@ -12,10 +12,16 @@ $.accountCheck = true;
 $.init = false;
 let cookiesArr = [], cookie = '', message, helpInfo, ADD_CART = true;
 
+function oc(fn, defaultVal) {
+    try {
+        return fn()
+    } catch (e) {
+        return undefined
+    }
+}
+
 if ($.isNode()) {
-    Object.keys(jdCookieNode).forEach((item) => {
-        cookiesArr.push(jdCookieNode[item])
-    })
+    Object.keys(jdCookieNode).forEach((item) => { cookiesArr.push(jdCookieNode[item]) })
     if (process.env.JD_DEBUG && process.env.JD_DEBUG === 'false') console.log = () => { };
 } else {
     cookiesArr = [$.getdata('CookieJD'), $.getdata('CookieJD2'), ...jsonParse($.getdata('CookiesJD') || "[]").map(item => item.cookie)].filter(item => !!item);
@@ -72,24 +78,37 @@ async function accountCheck() {
     console.log(`***检测账号是否黑号***`);
     // await getIsvToken()
     await getIsvToken2()
-    // await $.wait(10000)
+    await $.wait(1000)
     await getToken()
-    // await $.wait(10000)
+    await $.wait(1000)
     if (!$.token) {
         console.log(`\n\n提示：请尝试换服务器ip或者设置"xinruimz-isv.isvjcloud.com"域名直连，或者自定义UA再次尝试(环境变量JD_USER_AGENT)\n\n`)
         $.accountCheck = false;
         return
     }
-    let client = new WebSocket(`wss://xinruimz-isv.isvjcloud.com/wss/?token=${$.token}`, null, {
-        headers: {
-            'user-agent': $.UA,
-        }
-    });
+    let client = new WebSocket(`wss://xinruimz-isv.isvjcloud.com/wss/?token=${$.token}`,
+        {
+            headers: {
+                'user-agent': $.UA,
+                'Host': 'xinruimz-isv.isvjcloud.com',
+                'Connection': 'Upgrade',
+                'Upgrade': 'websocket',
+                'Origin': 'https://xinruimz-isv.isvjcloud.com',
+                'Sec-WebSocket-Version': '13',
+                'Accept-Encoding': 'gzip, deflate',
+                'Accept-Language': 'zh-CN,en-US;q=0.9',
+                'Cookie': `IsvToken=${$.token2}; jd-beauty-institute=${$.token}`,
+                'X-Requested-With': 'com.jingdong.app.mall',
+                // 'Sec-WebSocket-Key': 'uy3v+6kUxE58ju54yCc61A==',
+                'Sec-WebSocket-Extensions': 'permessage-deflate; client_max_window_bits'
+            }
+        });
     client.onopen = async () => {
         console.log(`美容研究院服务器连接成功`);
         client.send('{"msg":{"type":"action","args":{"source":1},"action":"_init_"}}');
         await $.wait(3000);
         client.send(`{"msg":{"type":"action","args":{"source":1},"action":"get_user"}}`);
+        await $.wait(3000);
     };
     client.onmessage = async function (e) {
         if (e.data !== 'pong' && e.data && safeGet(e.data)) {
@@ -113,7 +132,6 @@ async function accountCheck() {
             $.hasDone = true;
             console.log('服务器连接关闭\n');
         };
-        await $.wait(3000);
     }
 }
 
@@ -133,62 +151,66 @@ async function mr() {
     $.pos = []
     $.helpInfo = []
     $.needs = []
-    let client = new WebSocket(`wss://xinruimz-isv.isvjcloud.com/wss/?token=${$.token}`, null, {
-        headers: {
-            'user-agent': $.UA,
-        }
-    })
+    let client = new WebSocket(`wss://xinruimz-isv.isvjcloud.com/wss/?token=${$.token}`,
+        {
+            headers: {
+                'user-agent': $.UA,
+                'Host': 'xinruimz-isv.isvjcloud.com',
+                'Connection': 'Upgrade',
+                'Upgrade': 'websocket',
+                'Origin': 'https://xinruimz-isv.isvjcloud.com',
+                'Sec-WebSocket-Version': '13',
+                'Accept-Encoding': 'gzip, deflate',
+                'Accept-Language': 'zh-CN,en-US;q=0.9',
+                'Cookie': `IsvToken=${$.token2}; jd-beauty-institute=${$.token}`,
+                'X-Requested-With': 'com.jingdong.app.mall',
+                // 'Sec-WebSocket-Key': 'uy3v+6kUxE58ju54yCc61A==',
+                'Sec-WebSocket-Extensions': 'permessage-deflate; client_max_window_bits'
+            }
+        });
     console.log(`wss://xinruimz-isv.isvjcloud.com/wss/?token=${$.token}`)
     client.onopen = async () => {
         console.log(`美容研究院服务器连接成功`);
         client.send('{"msg":{"type":"action","args":{"source":1},"action":"_init_"}}');
+        await $.wait(3000);
         client.send(`{"msg":{"type":"action","args":{"source":"meizhuangguandibudaohang"},"action":"stats"}}`)
+        await $.wait(3000);
         while (!$.init) {
             client.send(`ping`)
             await $.wait(3000);
         }
         console.log(`\n========生产任务相关========\n`)
-        console.log('helpInfo', helpInfo);
         for (let help of helpInfo) {
             client.send(help);
         }
-        client.send(`{"msg":{"type":"action","args":{},"action":"check_up"}}`)
         await $.wait(3000)
-        client.send(`{"msg":{"type":"action","args":{},"action":"shop_products"}}`)
         // 获得可生产的原料列表
         client.send(`{"msg":{"type":"action","args":{},"action":"get_produce_material"}}`)
-        await $.wait(20000);
+        await $.wait(3000);
         // 获得正在生产的商品信息
         client.send('{"msg":{"type":"action","args":{},"action":"product_producing"}}')
-        await $.wait(20000);
+        await $.wait(3000);
         // 获得库存
         client.send(`{"msg":{"type":"action","args":{},"action":"get_package"}}`)
         // 获得可生成的商品列表
         client.send(`{"msg":{"type":"action","args":{"page":1,"num":10},"action":"product_lists"}}`)
-        await $.wait(20000);
+        await $.wait(3000);
         // 获得原料生产列表
-        console.log(`========原料生产信息========`)
         for (let pos of positionList) {
             client.send(`{"msg":{"type":"action","args":{"position":"${pos}"},"action":"produce_position_info_v2"}}`)
-            await $.wait(20000);
+            await $.wait(3000);
         }
         console.log(`\n========日常任务相关========`)
-        client.send(`{"msg":{"type":"action","args":{"source":1},"action":"get_user"}}`)
+        client.send(`{"msg":{"type":"action","args":{},"action":"check_up"}}`)
         await $.wait(3000);
-        // 获得福利中心
-        // client.send(`{"msg":{"type":"action","args":{},"action":"get_benefit"}}`)
-        client.send(`{"msg":{"type":"action","args":{},"action":"collect_coins"}}`);
-        // if ($.check_up) {
-        //     //收集
-        //     client.send(`{"msg":{"type":"action","args":{},"action":"collect_coins"}}`);
-        //     await $.wait(20000);
-        //     //兑换
-        //     client.send(`{"msg":{"type":"action","args":{},"action":"get_benefit"}}`)
-        //     await $.wait(50000);
-        //     //最后做时间最久的日常任务
-        //     client.send(`{"msg":{"type":"action","args":{},"action":"shop_products"}}`)
-        //     await $.wait(20000);
-        // }
+        if ($.check_up) {
+            //收集
+            client.send(`{"msg":{"type":"action","args":{},"action":"collect_coins"}}`);
+            await $.wait(5000);
+            //最后做时间最久的日常任务
+            client.send(`{"msg":{"type":"action","args":{},"action":"shop_products"}}`)
+            await $.wait(3000);
+        }
     };
     client.onclose = () => {
         console.log(`本次运行获得美妆币${$.coins}`)
@@ -205,7 +227,7 @@ async function mr() {
     client.onmessage = async function (e) {
         if (e.data !== 'pong' && e.data && safeGet(e.data)) {
             let vo = JSON.parse(e.data);
-            await $.wait(Math.random() * 2000 + 500);
+            await $.wait(Math.random() * 1000 + 500);
             console.log(`\n开始任务："${JSON.stringify(vo.action)}`);
             switch (vo.action) {
                 case "get_ad":
@@ -214,9 +236,9 @@ async function mr() {
                         // 去签到
                         console.log(`去做签到任务`)
                         client.send(`{"msg":{"type":"action","args":{},"action":"sign_in"}}`)
-                        // await $.wait(20000);
+                        await $.wait(3000);
                         client.send(`{"msg":{"action":"write","type":"action","args":{"action_type":1,"channel":2,"source_app":2}}}`)
-                        // await $.wait(20000);
+                        await $.wait(3000);
                     }
                     break
                 case "get_user":
@@ -233,33 +255,51 @@ async function mr() {
                     $.level = $.userInfo.level;
                     console.log(`当前美妆币${$.total}，用户等级${$.level}`);
                     break;
+                case "check_up":
+                    //获得当前任务状态
+                    $.taskState = vo.data
+                    // console.log($.taskState)
+                    $.check_up = true
+                    // 6-9点签到
+                    //for (let check_up of vo.data.check_up) {
+                    // if (check_up['receive_status'] !== 1) {
+                    //   console.log(`去领取第${check_up.times}次签到奖励`)
+                    //   client.send(`{"msg":{"type":"action","args":{"check_up_id":${check_up.id}},"action":"check_up_receive"}}`)
+                    // } else {
+                    //   console.log(`第${check_up.times}次签到奖励已领取`)
+                    // }
+                    // }
+                    break
                 case "shop_products":
                     let count = $.taskState.shop_view.length;
-                    if (count < 5) console.log(`去做关注店铺任务`);
-                    for (let i = 0; i < vo.data.shops.length && count < 5; ++i) {
+                    if (count < $.taskState.daily_shop_follow_times) console.log(`\n去做关注店铺任务\n`);
+                    for (let i = 0; i < vo.data.shops.length && count < $.taskState.daily_shop_follow_times; ++i) {
                         const shop = vo.data.shops[i];
                         if (!$.taskState.shop_view.includes(shop.id)) {
                             count++;
                             console.log(`\n去做关注店铺【${shop.name}】`);
                             client.send(`{"msg":{"type":"action","args":{"shop_id":${shop.id}},"action":"shop_view"}}`);
-                            await $.wait(5000);
+                            await $.wait(3000);
                             client.send(`{"msg":{"action":"write","type":"action","args":{"action_type":6,"channel":2,"source_app":2,"vender":"${shop.vender_id}"}}}`);
-                            await $.wait(5000);
+                            await $.wait(3000);
                         }
-                        await $.wait(3000);
+                        await $.wait(5000);
                     }
-                    let count2 = $.taskState.product_adds.length;
-                    if (count2 < 5 && ADD_CART) console.log(`去做浏览并加购任务`)
-                    for (let i = 0; i < vo.data.products.length && count2 < 5 && ADD_CART; ++i) {
+                    count = $.taskState.product_adds.length;
+                    if (count < $.taskState.daily_product_add_times && process.env.FS_LEVEL) console.log(`\n去做浏览并加购任务\n`)
+                    for (let i = 0; i < vo.data.products.length && count < $.taskState.daily_product_add_times && process.env.FS_LEVEL; ++i) {
                         const product = vo.data.products[i];
                         if (!$.taskState.product_adds.includes(product.id)) {
                             count++;
                             console.log(`\n去加购商品【${product.name}】`);
                             client.send(`{"msg":{"type":"action","args":{"add_product_id":${product.id}},"action":"add_product_view"}}`);
-                            client.send(`{"msg":{"action":"write","type":"action","args":{"action_type":9,"channel":2,"source_app":2,"vender":"${product.shop_id}"}}}`);
-                            client.send(`{"msg":{"action":"write","type":"action","args":{"action_type":5,"channel":2,"source_app":2,"vender":"${product.shop_id}"}}}`);
+                            await $.wait(3000);
+                            client.send(`{"msg":{"action":"write","type":"action","args":{"action_type":9,"channel":2,"source_app":2,"vender":"${product.id}"}}}`);
+                            await $.wait(3000);
+                            client.send(`{"msg":{"action":"write","type":"action","args":{"action_type":5,"channel":2,"source_app":2,"vender":"${product.id}"}}}`);
+                            await $.wait(3000);
                         }
-                        await $.wait(3000);
+                        await $.wait(5000);
                     }
                     if ($.taskState.meetingplace_view.length <= vo.data.meetingplaces.length) {
                         for (let vc of vo.data.meetingplaces) {
@@ -271,20 +311,8 @@ async function mr() {
                     if ($.taskState.today_answered === 0) {
                         console.log(`去做每日问答任务`)
                         client.send(`{"msg":{"type":"action","args":{"source":1},"action":"get_question"}}`)
-                        // await $.wait(2000);
+                        await $.wait(5000);
                     }
-                    break
-                case "check_up":
-                    $.taskState = vo.data
-                    // 6-9点签到
-                    // for (let check_up of vo.data.check_up) {
-                    //   if (check_up['receive_status'] !== 1) {
-                    //     console.log(`去领取第${check_up.times}次签到奖励`)
-                    //     client.send(`{"msg":{"type":"action","args":{"check_up_id":${check_up.id}},"action":"check_up_receive"}}`)
-                    //   } else {
-                    //     console.log(`第${check_up.times}次签到奖励已领取`)
-                    //   }
-                    // }
                     break
                 case 'newcomer_update':
                     if (vo.code === '200' || vo.code === 200) {
@@ -302,8 +330,8 @@ async function mr() {
                         const ques = questions[i]
                         commit[`${ques.id}`] = parseInt(ques.answers)
                     }
-                    await $.wait(5000);
                     client.send(`{"msg":{"type":"action","args":{"commit":${JSON.stringify(commit)},"correct":${questions.length}},"action":"submit_answer"}}`)
+                    await $.wait(5000);
                     break
                 case 'complete_task':
                 case 'action':
@@ -322,17 +350,18 @@ async function mr() {
                     break
                 case "produce_position_info_v2":
                     if (vo.data && vo.data.material_name !== '') {
-                        console.log(`【${vo.data.position}】上正在生产【${vo.data.material_name}】，可收取 ${vo.data.produce_num} 份`)
+                        console.log(`【${oc(() => vo.data.position)}】上正在生产【${oc(() => vo.data.material_name)}】，可收取 ${vo.data.produce_num} 份`)
                         if (new Date().getTime() > vo.data.procedure.end_at) {
-                            console.log(`去收取${vo.data.material_name}`)
-                            client.send(`{"msg":{"type":"action","args":{"position":"${vo.data.position}","replace_material":false},"action":"material_fetch_v2"}}`)
+                            console.log(`去收取${oc(() => vo.data.material_name)}`)
+                            client.send(`{"msg":{"type":"action","args":{"position":"${oc(() => vo.data.position)}","replace_material":false},"action":"material_fetch_v2"}}`)
+                            await $.wait(3000);
                             client.send(`{"msg":{"type":"action","args":{},"action":"to_employee"}}`)
-                            $.pos.push(vo.data.position)
-                            await $.wait(3000)
+                            await $.wait(3000);
+                            $.pos.push(oc(() => vo.data.position))
                         }
                     } else {
-                        if (vo.data && vo.data.valid_electric > 0) {
-                            console.log(`【${vo.data.position}】尚未开始生产`)
+                        if (oc(() => vo.data) && vo.data.valid_electric > 0) {
+                            console.log(`【${vo.data.position}】上尚未开始生产`)
                             let ma
                             console.log(`$.needs:${JSON.stringify($.needs)}`);
                             if ($.needs.length) {
@@ -346,11 +375,13 @@ async function mr() {
                             if (ma) {
                                 console.log(`去生产${ma.name}`)
                                 client.send(`{"msg":{"type":"action","args":{"position":"${vo.data.position}","material_id":${ma.id}},"action":"material_produce_v2"}}`)
+                                await $.wait(3000);
                             } else {
                                 ma = $.material.base[1]['items'][positionList.indexOf(vo.data.position)]
                                 if (ma) {
                                     console.log(`else去生产${ma.name}`)
                                     client.send(`{"msg":{"type":"action","args":{"position":"${vo.data.position}","material_id":${ma.id}},"action":"material_produce_v2"}}`)
+                                    await $.wait(3000);
                                 }
                             }
                         }
@@ -359,16 +390,16 @@ async function mr() {
                         }
                     }
                     break
-                // case "material_produce_v2":
-                //     console.log(`【${oc(() => vo.data.position)}】上开始生产${oc(() => vo.data.material_name)}`)
-                //     client.send(`{"msg":{"type":"action","args":{},"action":"to_employee"}}`)
-                //     await $.wait(5000);
-                //     if (oc(() => vo.data.position)) {
-                //         $.pos.push(vo.data.position)
-                //     } else {
-                //         console.log(`not exist:${oc(() => vo.data)}`)
-                //     }
-                //     break
+                case "material_produce_v2":
+                    console.log(`【${oc(() => vo.data.position)}】上开始生产${oc(() => vo.data.material_name)}`)
+                    client.send(`{"msg":{"type":"action","args":{},"action":"to_employee"}}`)
+                    await $.wait(3000);
+                    if (oc(() => vo.data.position)) {
+                        $.pos.push(vo.data.position)
+                    } else {
+                        console.log(`not exist:${oc(() => vo.data)}`)
+                    }
+                    break
                 case "material_fetch_v2":
                     if (vo.code === '200' || vo.code === 200) {
                         console.log(`【${vo.data.position}】收取成功，获得${vo.data.procedure.produce_num}份${vo.data.material_name}\n`);
@@ -410,7 +441,7 @@ async function mr() {
                                 } else {
                                     if (need_material.findIndex(vo => vo.id === material.material.id) === -1)
                                         need_material.push(material.material)
-                                    console.log(`need_material:${JSON.stringify(need_material)}`);
+                                    // console.log(`need_material:${JSON.stringify(need_material)}`);
                                     msg += `(没有库存)`
                                     num = -1000
                                 }
@@ -422,7 +453,7 @@ async function mr() {
                                 //product_produce 产品研发里的生产
                                 client.send(`{"msg":{"type":"action","args":{"product_id":${product.id},"amount":${num}},"action":"product_produce"}}`)
                                 client.send(`{"msg":{"type":"action","args":{"product_id":${product.id},"amount":${num}},"action":"once_completion"}}`)
-                                await $.wait(3000)
+                                await $.wait(5000);
                             } else {
                                 console.log(msg)
                                 console.log(`【${product.name}】原料不足，无法生产`)
@@ -458,6 +489,7 @@ async function mr() {
                         for (let product of vo.data) {
                             if (product.num === product.produce_num) {
                                 client.send(`{"msg":{"type":"action","args":{"log_id":${product.id}},"action":"new_product_fetch"}}`)
+                                await $.wait(3000);
                             } else {
                                 console.log(`产品【${product.product.id}】未生产完成，无法收取`)
                             }
@@ -473,49 +505,7 @@ async function mr() {
                         console.log(`收取产品失败，错误信息${vo.msg}`)
                     }
                     break
-                // case "get_task":
-                //   console.log(`当前任务【${vo.data.describe}】，需要【${vo.data.product.name}】${vo.data.package_stock}/${vo.data.num}份`)
-                //   if (vo.data.package_stock >= vo.data.num) {
-                //     console.log(`满足任务要求，去完成任务`)
-                //     client.send(`{"msg":{"type":"action","args":{"task_id":${vo.data.id}},"action":"complete_task"}}`)
-                //   }
-                //   break
-
-                // case 'get_benefit':
-                //     for (let benefit of vo.data) {
-                //         if (benefit.type === 1) { //type 1 是京豆
-                //             //console.log(`benefit:${JSON.stringify(benefit)}`);
-                //             if (benefit.description === "1 京豆" && parseInt(benefit.day_exchange_count) < 10 && $.total > benefit.coins) {
-                //                 $timenum = parseInt($.total / benefit.coins);
-                //                 if ($timenum > 10) $timenum = 10;
-                //                 console.log(`\n可兑换${$timenum}次京豆:`)
-                //                 for (let i = 0; i < $timenum; i++) {
-                //                     client.send(`{"msg":{"type":"action","args":{"benefit_id":${benefit.id}},"action":"to_exchange"}}`);
-                //                     await $.wait(5000)
-                //                     client.send(`{"msg":{"type":"action","args":{"source":1},"action":"get_user"}}`)
-                //                     await $.wait(5000);
-                //                 }
-                //             }
-                //             // console.log(`物品【${benefit.description}】需要${benefit.coins}美妆币，库存${benefit.stock}份`)
-                //             // if (parseInt(benefit.setting.beans_count) === bean && //兑换多少豆 bean500就500豆
-                //             //   $.total > benefit.coins &&
-                //             //   parseInt(benefit.day_exchange_count) < benefit.day_limit) {
-                //             //   console.log(`满足条件，去兑换`)
-                //             //   client.send(`{"msg":{"type":"action","args":{"benefit_id":${benefit.id}},"action":"to_exchange"}}`)
-                //             //   await $.wait(10000)
-                //             // }
-                //         }
-                //     }
-                //     break
-                // case "to_exchange":
-                //     if (oc(() => vo.data.coins)) {
-                //         console.log(`兑换${vo.data.coins / -1000}京豆成功`)
-                //     } else {
-                //         console.log(`兑换京豆失败`)
-                //     }
-                //     break
                 case "get_produce_material":
-                    console.log('get_produce_material', vo.msg);
                     $.material = vo.data
                     break
                 // case "to_employee":
