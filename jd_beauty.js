@@ -10,6 +10,8 @@ const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
 const WebSocket = require('ws');
 $.accountCheck = true;
 $.init = false;
+$.bean = '1'; //兑换多少豆 好像一次只能1个
+
 let cookiesArr = [], cookie = '', message, helpInfo, ADD_CART = true;
 
 function oc(fn, defaultVal) {
@@ -207,6 +209,9 @@ async function mr() {
             //收集
             client.send(`{"msg":{"type":"action","args":{},"action":"collect_coins"}}`);
             await $.wait(5000);
+            //兑换京豆
+            client.send(`{"msg":{"type":"action","args":{},"action":"get_benefit"}}`)
+            await $.wait(3000);
             //最后做时间最久的日常任务
             client.send(`{"msg":{"type":"action","args":{},"action":"shop_products"}}`)
             await $.wait(3000);
@@ -519,6 +524,31 @@ async function mr() {
                 case "employee_v2":
                     console.log(`${vo.msg}`)
                     break
+                case 'get_benefit':
+                    console.log(`\n\n=======开始兑换京豆=======\n`);
+                    for (let benefit of vo.data) {
+                        if (benefit.type === 1) { //type 1 是京豆 
+                            console.log(`物品【${benefit.description}】需要${benefit.coins}美妆币，库存${benefit.stock}份`)
+                            if (parseInt(benefit.day_exchange_count) >= benefit.day_limit) console.log("今日兑换次数已用完")
+                            for (let i = benefit.day_exchange_count; i < benefit.day_limit; i++) {
+                                if (parseInt(benefit.setting.beans_count) == $.bean && $.total >= benefit.coins && parseInt(benefit.day_exchange_count) < benefit.day_limit) {
+                                    console.log(`满足条件，去兑换`)
+                                    client.send(`{"msg":{"type":"action","args":{"benefit_id":${benefit.id}},"action":"to_exchange"}}`)
+                                    await $.wait(4000)
+                                    client.send(`{"msg":{"type":"action","args":{"source":1},"action":"get_user"}}`)
+                                } else console.log(`不满足兑换条件`)
+                            }
+                        }
+                    }
+                    console.log(`\n`);
+                    break;
+                case "to_exchange":
+                    if (vo.data) {
+                        console.log(`兑换${vo.data.coins / -10000}京豆成功;${JSON.stringify(vo)}`)
+                    } else {
+                        console.log(`兑换京豆失败：${JSON.stringify(vo)}`)
+                    }
+                    break;
             }
         }
     };
