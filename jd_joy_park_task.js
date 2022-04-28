@@ -26,6 +26,7 @@ if ($.isNode()) {
 $.invitePinTaskList = []
 $.invitePin = []
 $.unLogins = []
+$.balckIndexs = []
 
 const JD_API_HOST = `https://api.m.jd.com/client.action`;
 message = ""
@@ -86,6 +87,7 @@ message = ""
                 // $.log(`${$.name} - ${$.UserName}  助力码: null`);
                 // $.invitePinTaskList.push('');
                 console.log(`活动信息获取失败`);
+                $.balckIndexs.push($.index)
                 continue
             }
 
@@ -159,7 +161,12 @@ message = ""
             $.nickName = '';
             console.log(`\n******开始【京东账号${$.index}】${$.nickName || $.UserName}*********\n`);
             if ($.unLogins.includes($.index)) {
-                console.log("Cookie已失效. . .")
+                console.log("Cookie已失效、跳过")
+                continue
+            }
+
+            if ($.balckIndexs.includes($.index)) {
+                console.log("账号数据异常、跳过")
                 continue
             }
 
