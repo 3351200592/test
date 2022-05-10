@@ -807,7 +807,7 @@ function jdfruitRequest(function_id, body = {}, timeout = 1000) {
                     } else {
                         if (safeGet(data)) {
                             data = JSON.parse(data);
-                            $.JDwaterEveryDayT = data.totalWaterTaskInit.totalWaterTaskTimes;
+                            $.JDwaterEveryDayT = data?.totalWaterTaskInit?.totalWaterTaskTimes || 0;
                         }
                     }
                 } catch (e) {
