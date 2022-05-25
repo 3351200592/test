@@ -20,7 +20,7 @@ let cookiesArr = [], cookie = '';
 let hotFlag = false;
 
 const thefs = require('fs');
-const thepath = '/jd/scripts/0sendNotify_Annyooo.js'
+const thepath = './0sendNotify_Annyooo.js'
 const notifyTip = $.isNode() ? process.env.MY_NOTIFYTIP : false;
 
 if ($.isNode()) {
