@@ -28,7 +28,7 @@ const jsdom = $.isNode() ? require('jsdom') : '';
 let cookiesArr = [], cookie = '', message, allMessage = '';
 
 const thefs = require('fs');
-const thepath = '/jd/scripts/0sendNotify_Annyooo.js'
+const thepath = './0sendNotify_Annyooo.js'
 const notifyTip = $.isNode() ? process.env.MY_NOTIFYTIP : false;
 
 Date.prototype.Format = function (fmt) {
