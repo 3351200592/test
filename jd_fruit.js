@@ -13,7 +13,7 @@ let newShareCodes = [];
 let message = '', subTitle = '', option = {}, isFruitFinished = false;
 
 const thefs = require('fs');
-const thepath = '/jd/scripts/0sendNotify_Annyooo.js'
+const thepath = './0sendNotify_Annyooo.js'
 const notifyTip = $.isNode() ? process.env.MY_NOTIFYTIP : false;
 
 let outpath = './Fruit_HelpOut.json'
