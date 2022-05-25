@@ -12,7 +12,7 @@ const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
 const notifyTip = $.isNode() ? process.env.BEAN_CHANGE_NOTIFYTIP : false;
 
 const thefs = require('fs');
-const thepath = '/jd/scripts/0sendNotify_Annyooo.js'
+const thepath = './0sendNotify_Annyooo.js'
 const thenotifyTip = $.isNode() ? process.env.MY_NOTIFYTIP : false;
 
 let allMessage = '';
