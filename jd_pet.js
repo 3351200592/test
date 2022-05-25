@@ -13,7 +13,7 @@ let newShareCodes = [];
 let message = '', subTitle = '', option = {};
 
 const thefs = require('fs');
-const thepath = '/jd/scripts/0sendNotify_Annyooo.js'
+const thepath = './0sendNotify_Annyooo.js'
 const notifyTip = $.isNode() ? process.env.MY_NOTIFYTIP : false;
 
 let outpath = './Pet_HelpOut.json'
