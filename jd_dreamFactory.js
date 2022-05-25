@@ -27,7 +27,7 @@ let cookiesArr = [], cookie = '', message = '', allMessage = '';
 
 const { Console } = require('console');
 const thefs = require('fs');
-const thepath = '/jd/scripts/0sendNotify_Annyooo.js'
+const thepath = './0sendNotify_Annyooo.js'
 const notifyTip = $.isNode() ? process.env.MY_NOTIFYTIP : false;
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
 
