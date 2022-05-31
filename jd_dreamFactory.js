@@ -249,8 +249,9 @@ if ($.isNode()) {
 async function jdDreamFactory() {
     try {
         $.NeedLogin = false
+        $.isBlack = false
         await userInfo();
-        if ($.NeedLogin) return
+        if ($.NeedLogin || $.isBlack) return
         await QueryFriendList();//查询今日招工情况以及剩余助力次数
         // await joinLeaderTuan();//参团
         if (!$.unActive) return
@@ -803,6 +804,7 @@ function userInfo() {
                                 console.log("Cookie过期 . . .")
                                 $.NeedLogin = true
                             } else {
+                                $.isBlack = true
                                 if (!$.blackIndexs.includes($.index)) $.blackIndexs.push($.index)
                             }
                         }
