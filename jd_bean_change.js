@@ -42,7 +42,7 @@ if (Authorization && Authorization.indexOf("Bearer ") === -1) Authorization = `B
         $.msg($.name, '【提示】请先获取京东账号一cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/bean/signIndex.action', { "open-url": "https://bean.m.jd.com/bean/signIndex.action" });
         return;
     }
-    for (let i = 0; i < cookiesArr.length; i++) {
+    for (let i = 48; i < cookiesArr.length; i++) {
         if (cookiesArr[i]) {
             cookie = cookiesArr[i];
             $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1])
@@ -103,7 +103,7 @@ if (Authorization && Authorization.indexOf("Bearer ") === -1) Authorization = `B
             await JxmcGetRequest();
             await bean();
             await GetJxBeanInfo();
-            await jxbean();
+            // await jxbean();
             await getJxFactory();   //京喜工厂
             await showMsg();
         }
@@ -256,7 +256,7 @@ async function bean() {
                     }
                 }
             } else {
-                $.errorMsg = `数据异常`;
+                $.errorMsg = `bean: 数据异常`;
                 $.msg($.name, ``, `账号${$.index}：${$.nickName}\n${$.errorMsg}`);
                 t = 1;
             }
@@ -341,8 +341,8 @@ async function jxbean() {
                 }
             }
         } else {
-            $.errorMsg = `数据异常`;
-            $.msg($.name, ``, `账号${$.index}：${$.nickName}\n${$.errorMsg}`);
+            // $.errorMsg = `数据异常`;
+            // $.msg($.name, ``, `账号${$.index}：${$.nickName}\n${$.errorMsg}`);
         }
         for (let item of JxYesterdayArr) {
             if (Number(item.amount) > 0) {
@@ -443,7 +443,7 @@ function TotalBean() {
                         if (data['retcode'] === '0' && data.data && data.data['assetInfo']) {
                             $.beanCount = data.data && data.data['assetInfo']['beanNum'];
                         } else {
-                            $.errorMsg = `数据异常`;
+                            $.errorMsg = `TotalBean: 数据异常`;
                         }
                     } else {
                         $.log('京东服务器返回空数据,将无法获取等级及VIP信息');
