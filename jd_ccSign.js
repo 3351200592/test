@@ -57,7 +57,7 @@ const JD_API_HOST = 'https://api.m.jd.com/client.action';
                 continue
             }
             await jdSign()
-            await $.wait(5000)
+            await $.wait(35000)
             //if ($.index % 3 == 0) {
             //    await $.wait(35000)
             //}
