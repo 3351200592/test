@@ -17,9 +17,6 @@
 # 跳跳乐瓜分京豆 (什么时候结束)
 # 1 0,9,15,21 * * * node /scripts/jd_jump.js >> /scripts/logs/jd_jump.log 2>&1
 
-# 金榜年终奖
-#3 1,5 * * * node /scripts/jd_split.js >> /scripts/logs/jd_split.log 2>&1
-
 # 京喜领88元红包(9.30结束)
 # 0 0,12,21 * * * node /scripts/jd_jxlhb.js >> /scripts/logs/jd_jxlhb.log 2>&1
 
