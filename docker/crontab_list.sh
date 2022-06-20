@@ -38,9 +38,6 @@
 # 金榜年终奖
 #3 1,5 * * * node /scripts/jd_split.js >> /scripts/logs/jd_split.log 2>&1
 
-# 大赢家之翻翻乐 (没看什么时候结束)
-20,40 * * * * node /scripts/jd_big_winner.js >> /scripts/logs/jd_big_winner.log 2>&1
-
 # 京喜领88元红包(9.30结束)
 # 0 0,12,21 * * * node /scripts/jd_jxlhb.js >> /scripts/logs/jd_jxlhb.log 2>&1
 
