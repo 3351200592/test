@@ -1,5 +1,8 @@
 ####################过期活动的定时####################
 
+# 进店领豆
+0 0 * * * node /scripts/jd_shop.js >> /scripts/logs/jd_shop.log 2>&1
+
 # 京东排行榜
 11 0 * * * node /scripts/jd_rankingList.js >> /scripts/logs/jd_rankingList.log 2>&1
 
