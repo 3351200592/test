@@ -1,5 +1,8 @@
 ####################过期活动的定时####################
 
+# 幸运大转盘
+10 10,23 * * * node /scripts/jd_market_lottery.js >> /scripts/logs/jd_market_lottery.log 2>&1
+
 # 京东零食街 活动时间：年底
 11 11 * * * node /scripts/jd_lsj.js >> /scripts/logs/jd_lsj.log 2>&1
 
