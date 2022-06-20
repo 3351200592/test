@@ -1,5 +1,8 @@
 ####################过期活动的定时####################
 
+# 京喜签到
+# 6 1,9 * * * node /scripts/jd_jxqd.js >> /scripts/logs/jd_jxqd.log 2>&1
+
 # 金榜年终奖
 #3 1,5 * * * node /scripts/jd_split.js >> /scripts/logs/jd_split.log 2>&1
 
