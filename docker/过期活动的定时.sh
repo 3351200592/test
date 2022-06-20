@@ -1,5 +1,8 @@
 ####################过期活动的定时####################
 
+#家庭号(易黑号，默认注释)
+#10 6,7 * * * node /scripts/jd_family.js >> /scripts/logs/jd_family.log 2>&1
+
 # 京东到家果园
 10 0,3,8,11,17 * * * node /scripts/jd_dj_fruit.js >> /scripts/logs/jd_dj_fruit.log 2>&1
 # 京东到家鲜豆任务
