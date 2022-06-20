@@ -1,5 +1,8 @@
 ####################过期活动的定时####################
 
+# 大赢家之翻翻乐 (没看什么时候结束)
+20,40 * * * * node /scripts/jd_big_winner.js >> /scripts/logs/jd_big_winner.log 2>&1
+
 # 进店领豆
 0 0 * * * node /scripts/jd_shop.js >> /scripts/logs/jd_shop.log 2>&1
 
