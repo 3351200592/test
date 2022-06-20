@@ -1,5 +1,8 @@
 ####################过期活动的定时####################
 
+# 口袋书店
+38 8,12,18 * * * node /scripts/jd_bookshop.js >> /scripts/logs/jd_bookshop.log 2>&1
+
 # 城城领现金
 3 0,5,9,13,17,22 9-21 1 * node /scripts/jd_city.js >> /scripts/logs/jd_city.log 2>&1
 
