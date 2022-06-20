@@ -5,18 +5,6 @@
 
 ##############短期活动##############
 
-# 头文字J 助力
-11 3,13 * * * node /scripts/jd_mpdzcar_help.js >> /scripts/logs/jd_mpdzcar_help.log 2>&1
-
-# 头文字J 游戏
-3 1,10,16 * * * node /scripts/jd_mpdzcar_game.js >> /scripts/logs/jd_mpdzcar_game.log 2>&1
-
-# 头文子J
-7 0,9 * * * node /scripts/jd_mpdzcar.js >> /scripts/logs/jd_mpdzcar.log 2>&1
-
-# 京东小魔方 (3.21? 结束)
-13 0,10 * * * node /scripts/jd_mf.js >> /scripts/logs/jd_mf.log 2>&1
-
 # QQ星系牧场
 11 0-23/2 * * * node /scripts/jd_qqxing.js >> /scripts/logs/jd_qqxing.log 2>&1
 
