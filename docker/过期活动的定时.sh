@@ -1,5 +1,8 @@
 ####################过期活动的定时####################
 
+# 京东零食街 活动时间：年底
+11 11 * * * node /scripts/jd_lsj.js >> /scripts/logs/jd_lsj.log 2>&1
+
 #家庭号(易黑号，默认注释)
 #10 6,7 * * * node /scripts/jd_family.js >> /scripts/logs/jd_family.log 2>&1
 
