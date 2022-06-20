@@ -1,5 +1,8 @@
 ####################过期活动的定时####################
 
+# 萌虎摇摇乐
+0 1,10,20 * * * node /scripts/jd_mhyyl.js >> /scripts/logs/jd_mhyyl.log 2>&1
+
 # 头文字J 助力
 11 3,13 * * * node /scripts/jd_mpdzcar_help.js >> /scripts/logs/jd_mpdzcar_help.log 2>&1
 
