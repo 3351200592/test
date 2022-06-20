@@ -71,9 +71,6 @@
 # 5G超级盲盒(活动时间：2021-06-2到2021-07-31)
 0 0-23/4 * * * node /scripts/jd_mohe.js >> /scripts/logs/jd_mohe.log 2>&1
 
-# 京东零食街 活动时间：年底
-11 11 * * * node /scripts/jd_lsj.js >> /scripts/logs/jd_lsj.log 2>&1
-
 ##############长期活动##############
 
 # 签到
