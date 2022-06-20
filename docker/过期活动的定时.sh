@@ -1,5 +1,8 @@
 ####################过期活动的定时####################
 
+# QQ星系牧场
+11 0-23/2 * * * node /scripts/jd_qqxing.js >> /scripts/logs/jd_qqxing.log 2>&1
+
 # 萌虎摇摇乐
 0 1,10,20 * * * node /scripts/jd_mhyyl.js >> /scripts/logs/jd_mhyyl.log 2>&1
 
