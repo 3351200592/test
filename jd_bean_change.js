@@ -76,6 +76,9 @@ if (Authorization && Authorization.indexOf("Bearer ") === -1) Authorization = `B
             $.JDEggcnt = 0;
             $.Jxmctoken = '';
             $.TotalMoney = 0;
+            $.eCards = ""
+            $.eCardNum = 0
+
             await TotalBean();
             await TotalBean2();
             console.log(`\n********开始【京东账号${$.index}】${$.nickName || $.UserName}******\n`);
@@ -105,6 +108,7 @@ if (Authorization && Authorization.indexOf("Bearer ") === -1) Authorization = `B
             await GetJxBeanInfo();
             // await jxbean();
             await getJxFactory();   //京喜工厂
+            await getECard()
             await showMsg();
         }
         if ($.isNode() && notifyTip && allMessage) {
@@ -213,6 +217,9 @@ async function showMsg() {
     ReturnMessage += `🧧🧧🧧🧧红包明细🧧🧧🧧🧧`;
 
     let theMessage = ReturnMessage;
+
+    if ($.eCardNum) $.message += `\n京东 E卡：${$.eCardNum}张、共${$.eCards}元`
+    else $.message += `\n京东 E卡：0张`
 
     ReturnMessage += `${$.message}\n\n`;
     allMessage += ReturnMessage;
@@ -936,6 +943,45 @@ async function TotalMoney() {
 }
 
 
+function getECard() {
+    return new Promise(resolve => {
+        let options = {
+            url: `https://mygiftcard.jd.com/giftcard/queryGiftCardCountStatusCom/app?source=JDAP`,
+            body: `queryList=a%2Cb%2Cc%2Cd%2Ce%2Cf`,
+            headers: {
+                "Accept": "*/*",
+                "Accept-Language": "zh-cn",
+                "Accept-Encoding": "gzip, deflate, br",
+                "Connection": "keep-alive",
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Host': 'mygiftcard.jd.com',
+                'Cookie': cookie,
+                'User-Agent': $.UA,
+                'origin': 'https://mygiftcard.jd.com',
+            }
+        }
+        $.post(options, async (err, resp, data) => {
+            try {
+                if (err) {
+                    // console.log(`${JSON.stringify(err)}`)
+                } else {
+                    let res = $.toObj(data, data)
+                    if (typeof res == 'object') {
+                        if (res.code == "success" && res.data)
+                            $.eCards = res.data.a
+                        $.eCardNum = Number(res.data.b)
+                    }
+                }
+            } catch (e) {
+                $.logErr(e, resp)
+            } finally {
+                resolve();
+            }
+        })
+    })
+}
+
+
 function getSign(functionId, body) {
     let sign = ''
     let flag = false
@@ -960,7 +1006,7 @@ function getSign(functionId, body) {
     return new Promise((resolve) => {
         let options = {
             url: jdSignUrl,
-            body: JSON.stringify({"fn":functionId,"body": body}),
+            body: JSON.stringify({ "fn": functionId, "body": body }),
             followRedirect: false,
             headers: {
                 'Accept': '*/*',
