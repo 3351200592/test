@@ -78,6 +78,8 @@ if (Authorization && Authorization.indexOf("Bearer ") === -1) Authorization = `B
             $.TotalMoney = 0;
             $.eCards = ""
             $.eCardNum = 0
+            $.AccBalance = ""
+            $.WalletBalance = ""
 
             await TotalBean();
             await TotalBean2();
@@ -109,6 +111,8 @@ if (Authorization && Authorization.indexOf("Bearer ") === -1) Authorization = `B
             // await jxbean();
             await getJxFactory();   //京喜工厂
             await getECard()
+            await getAccBalance()
+            await getBalance()
             await showMsg();
         }
         if ($.isNode() && notifyTip && allMessage) {
@@ -220,6 +224,8 @@ async function showMsg() {
 
     if ($.eCardNum) $.message += `\n京东 E卡：${$.eCardNum}张、共${$.eCards}元`
     else $.message += `\n京东 E卡：0张`
+    if ($.AccBalance) $.message += `\n${$.AccBalance}`
+    if ($.WalletBalance) $.message += `\n${$.WalletBalance}`
 
     ReturnMessage += `${$.message}\n\n`;
     allMessage += ReturnMessage;
@@ -979,6 +985,87 @@ function getECard() {
             }
         })
     })
+}
+
+
+function getAccBalance() {
+    return new Promise(resolve => {
+        let options = {
+            url: `https://ms.jr.jd.com/gw/generic/jrm/h5/m/queryUserAccBalance`,
+            body:`reqData=&source=jrm`,
+            headers: {
+                "Accept": "*/*",
+                "Accept-Language": "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7",
+                "Accept": "application/json",
+                "Accept-Encoding": "gzip, deflate, br",
+                "Connection": "keep-alive",
+                "Content-Type": 'application/x-www-form-urlencoded',
+                "Host": 'ms.jr.jd.com',
+                "Cookie": cookie,
+                "User-Agent": $.UA,
+                "origin": "https://m.jr.jd.com",
+                "Referer": "https://m.jr.jd.com/",
+            }
+        };
+        $.post(options, async (err, resp, data) => {
+            try {
+                if (err) {
+                    // console.log(err);
+                } else {
+                    let res = $.toObj(data, data)
+                    if (res.resultCode == 0 && res.resultData && res.resultData.data) {
+                        $.AccBalance = `账户余额：${res.resultData.data.balance.toFixed(2)}元`
+                    }
+                }
+            } catch (e) {
+                console.log(e, resp);
+            } finally {
+                resolve();
+            }
+        });
+    });
+}
+
+function getBalance() {
+    return new Promise(resolve => {
+        let options = {
+            url: `https://ms.jr.jd.com/gw/generic/base/h5/m/queryBalance`,
+            body:`reqData=&source=jrm`,
+            headers: {
+                "Accept": "*/*",
+                "Accept-Language": "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7",
+                "Accept": "application/json",
+                "Accept-Encoding": "gzip, deflate, br",
+                "Connection": "keep-alive",
+                "Content-Type": 'application/x-www-form-urlencoded',
+                "Host": 'ms.jr.jd.com',
+                "Cookie": cookie,
+                "User-Agent": $.UA,
+                "origin": "https://m.jr.jd.com",
+                "Referer": "https://m.jr.jd.com/",
+            }
+        };
+        $.post(options, async (err, resp, data) => {
+            try {
+                if (err) {
+                    // console.log(err);
+                } else {
+                    let res = $.toObj(data, data)
+                    if (res.resultCode == 0 && res.resultData) {
+                        if (res.resultData.qianbaoAccountExist) {
+                            $.WalletBalance = `钱包余额：${(res.resultData.qianbaoTotalBalance / 100).toFixed(2)}元`
+                        } else {
+                            $.WalletBalance = `钱包余额：未开通钱包`
+                        }
+                    }
+                }
+            } catch (e) {
+                console.log(e, resp);
+            } finally {
+                resolve();
+            }
+        });
+    });
 }
 
 
