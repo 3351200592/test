@@ -1,5 +1,10 @@
 ####################过期活动的定时####################
 
+# 宠汪汪跑验证码
+58 7,15,23 * * * node /scripts/jd_work_validate.js >> /scripts/logs/jd_work_validate.log 2>&1
+# 宠汪汪兑换
+0 */8 * * * node /scripts/jd_exchange_joy.js >> /scripts/logs/jd_exchange_joy.log 2>&1
+
 # 京喜签到
 # 6 1,9 * * * node /scripts/jd_jxqd.js >> /scripts/logs/jd_jxqd.log 2>&1
 
