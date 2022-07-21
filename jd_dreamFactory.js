@@ -291,7 +291,7 @@ function collectElectricity(facId = $.factoryId, help = false, master) {
                 } else {
                     if (safeGet(data)) {
                         data = JSON.parse(data);
-                        if (data['ret'] === 0) {
+                        if (data['ret'] == 0 && data.data) {
                             if (help) {
                                 $.ele += Number(data.data['loginPinCollectElectricity'])
                                 console.log(`帮助好友收取 ${data.data['CollectElectricity']} 电力，获得 ${data.data['loginPinCollectElectricity']} 电力`);
@@ -418,7 +418,7 @@ function getUserElectricity() {
                 } else {
                     if (safeGet(data)) {
                         data = JSON.parse(data);
-                        if (data['ret'] === 0) {
+                        if (data['ret'] == 0 && data.data) {
                             console.log(`发电机：当前 ${data.data.currentElectricityQuantity} 电力，最大值 ${data.data.maxElectricityQuantity} 电力`)
                             if (data.data.currentElectricityQuantity < data.data.maxElectricityQuantity) {
                                 $.log(`\n本次发电机电力集满分享后${data.data.nextCollectDoubleFlag === 1 ? '可' : '不可'}获得双倍电力，${data.data.nextCollectDoubleFlag === 1 ? '故目前不收取电力' : '故现在收取电力'}\n`)
@@ -459,7 +459,7 @@ function QueryHireReward() {
                 } else {
                     if (safeGet(data)) {
                         data = JSON.parse(data);
-                        if (data['ret'] === 0) {
+                        if (data['ret'] == 0 && data.data) {
                             for (let item of data['data']['hireReward']) {
                                 if (item.date !== new Date(new Date().getTime() + new Date().getTimezoneOffset() * 60 * 1000 + 8 * 60 * 60 * 1000).Format("yyyyMMdd")) {
                                     await hireAward(item.date, item.type);
@@ -606,8 +606,8 @@ function QueryFriendList() {
                 } else {
                     if (safeGet(data)) {
                         data = JSON.parse(data);
-                        if (data['ret'] === 0) {
-                            data = data['data'];
+                        if (data['ret'] == 0 && data.data) {
+                            data = data.data;
                             const { assistListToday = [], assistNumMax, hireListToday = [], hireNumMax } = data;
                             console.log(`\n\n你今日还能帮好友打工（${assistNumMax - assistListToday.length || 0}/${assistNumMax}）次\n\n`);
                             if (assistListToday.length === assistNumMax) {
@@ -711,7 +711,7 @@ function userInfo() {
                 } else {
                     if (safeGet(data)) {
                         data = JSON.parse(data);
-                        if (data['ret'] === 0) {
+                        if (data['ret'] == 0 && data.data) {
                             data = data['data'];
                             $.unActive = true;//标记是否开启了京喜活动或者选购了商品进行生产
                             $.encryptPin = '';
@@ -831,7 +831,7 @@ function GetCommodityDetails() {
                 } else {
                     if (safeGet(data)) {
                         data = JSON.parse(data);
-                        if (data['ret'] === 0) {
+                        if (data['ret'] == 0 && data.data) {
                             data = data['data'];
                             $.productName = data['commodityList'][0].name;
                         } else {
@@ -859,7 +859,7 @@ function GetShelvesList(pageNo = 1) {
                 } else {
                     if (safeGet(data)) {
                         data = JSON.parse(data);
-                        if (data['ret'] === 0) {
+                        if (data['ret'] == 0 && data.data) {
                             data = data['data'];
                             const { shelvesList } = data;
                             if (shelvesList) {
@@ -1046,7 +1046,7 @@ function getFriendList(sort = 0) {
                 } else {
                     if (safeGet(data)) {
                         data = JSON.parse(data);
-                        if (data['ret'] === 0) {
+                        if (data['ret'] == 0 && data.data) {
                             data = data['data'];
                             if (data.list && data.list.length <= 0) {
                                 // console.log(`查询好友列表完成，共${$.friendList.length}好友，下面开始拾取好友地下的零件\n`);
@@ -1084,7 +1084,7 @@ function getFactoryIdByPin(pin) {
                 } else {
                     if (safeGet(data)) {
                         data = JSON.parse(data);
-                        if (data['ret'] === 0) {
+                        if (data['ret'] == 0 && data.data) {
                             if (data.data.factoryList) {
                                 //做此判断,有时候返回factoryList为null
                                 // resolve(data['data']['factoryList'][0]['factoryId'])
@@ -1178,7 +1178,7 @@ function QueryActiveConfig() {
                 } else {
                     if (safeGet(data)) {
                         data = JSON.parse(data);
-                        if (data['ret'] === 0) {
+                        if (data['ret'] == 0 && data.data) {
                             const { userTuanInfo } = data['data'];
                             console.log(`\n团活动ID  ${userTuanInfo.activeId}`);
                             console.log(`团ID  ${userTuanInfo.tuanId}\n`);
@@ -1208,7 +1208,7 @@ function QueryTuan(activeId, tuanId) {
                 } else {
                     if (safeGet(data)) {
                         data = JSON.parse(data);
-                        if (data['ret'] === 0) {
+                        if (data['ret'] == 0 && data.data) {
                             // $.log(`\n开团情况:${data.data.tuanInfo.realTuanNum}/${data.data.tuanInfo.tuanNum}\n`)
                         } else {
                             console.log(`异常：${JSON.stringify(data)}`);
@@ -1237,7 +1237,7 @@ function CreateTuan() {
                 } else {
                     if (safeGet(data)) {
                         data = JSON.parse(data);
-                        if (data['ret'] === 0) {
+                        if (data['ret'] == 0 && data.data) {
                             console.log(`【开团成功】tuanId为 ${data.data['tuanId']}`);
                             $.tuanIds.push(data.data['tuanId']);
                         } else {
@@ -1362,7 +1362,7 @@ function tuanAward(activeId, tuanId, isTuanLeader = true) {
                 } else {
                     if (safeGet(data)) {
                         data = JSON.parse(data);
-                        if (data['ret'] === 0) {
+                        if (data['ret'] == 0 && data.data) {
                             if (isTuanLeader) {
                                 console.log(`开团奖励(团长)${data.data['electric']}领取成功`);
                                 message += `【开团(团长)奖励】${data.data['electric']}领取成功\n`;
