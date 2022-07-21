@@ -1,5 +1,8 @@
 ####################过期活动的定时####################
 
+# 东东电竞经理
+15 10 * * * node /scripts/jd_Elecsport.js >> /scripts/logs/jd_Elecsport.log 2>&1
+
 # 宠汪汪跑验证码
 58 7,15,23 * * * node /scripts/jd_work_validate.js >> /scripts/logs/jd_work_validate.log 2>&1
 # 宠汪汪兑换
