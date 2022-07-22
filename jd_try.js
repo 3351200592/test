@@ -63,7 +63,7 @@ $.innerKeyWords =
         "安全套", "龟头", "阴道", "阴部", "手机卡", "流量",
         "看房", "赠品", "软件", "脚气", "种子", "癣", "中年",
         "老太太", "妇女", "私处", "孕妇", "卫生巾", "卫生条",
-        "课", "生殖器", "狐臭", "网校", "电商", "俄语", 
+        "课", "生殖器", "狐臭", "网校", "电商", "俄语",
         "四级", "六级", "四六级", "在线", "宫颈", "壁纸", "戒烟"
     ]
 //下面很重要，遇到问题请把下面注释看一遍再来问
@@ -134,7 +134,7 @@ let args_xh = {
      * 可设置环境变量：JD_TRY_APPLYINTERVAL
      * 默认为3000，也就是3秒
      * */
-    applyInterval: process.env.JD_TRY_APPLYINTERVAL * 1 || 3000,
+    applyInterval: process.env.JD_TRY_APPLYINTERVAL * 1 || 3600,
     /*
      * 商品数组的最大长度，通俗来说就是即将申请的商品队列长度
      * 例如设置为20，当第一次获取后获得12件，过滤后剩下5件，将会进行第二次获取，过滤后加上第一次剩余件数
@@ -254,7 +254,7 @@ let args_xh = {
                     }
                     await try_apply(trialActivityTitleList[i], trialActivityIdList[i])
                     //console.log(`间隔等待中，请等待 ${args_xh.applyInterval} ms\n`)
-                    let waitTime = generateRandomInteger(args_xh.applyInterval, 8000);
+                    let waitTime = generateRandomInteger(args_xh.applyInterval + 500, 8000);
                     console.log(`\n随机等待${waitTime}ms后申请下一个`);
                     await $.wait(waitTime);
                 }
@@ -528,6 +528,17 @@ async function try_apply(title, activityId, flag = 0) {
                 } else {
                     $.totalTry++
                     data = JSON.parse(data)
+
+
+                    if (flag < 5 && data.message && /(操作不要太快)/g.test(data.message)) {
+                        flag = flag + 1
+                        let waitTime = generateRandomInteger(args_xh.applyInterval, 6000)
+                        console.log(`申请失败、随机等待${waitTime}ms后重试第${flag}次`)
+                        await $.wait(waitTime)
+                        await try_apply(title, activityId, flag)
+                    }
+
+
                     if (data.success && data.code === "1") {  // 申请成功
                         console.log("申请提交成功")
                         $.totalSuccess++
@@ -545,7 +556,7 @@ async function try_apply(title, activityId, flag = 0) {
                     } else if (data.code === "-113") {
                         console.log(data.message)   // 操作不要太快哦！
                     } else {
-                        console.log("申请失败", data)
+                        console.log(`${data.message || '申请失败:' + JSON.stringify(data)}`)
                     }
                 }
             } catch (e) {
