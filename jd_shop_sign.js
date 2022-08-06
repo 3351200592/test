@@ -105,10 +105,6 @@ if ($.isNode()) {
                     break
                 }
                 if (!$.venderId) continue
-                if (!$.shopName) {
-                    $.theshopurl = `https://shop.m.jd.com/?venderId=${$.venderId}`
-                    await getshopname($.theshopurl)
-                }
                 if (!$.shopName) await getvenderName($.venderId)
                 if (!$.activityId) await getActivityInfo($.thistoken, $.venderId)
                 if ($.outFlag) break
@@ -316,42 +312,6 @@ function signCollectGift(token, venderId, activitytemp) {
                 $.logErr(e, resp);
             } finally {
                 resolve(data);
-            }
-        })
-    })
-}
-
-function getshopname(url) {
-    return new Promise(resolve => {
-        let options = {
-            url: `${url}`,
-            headers: {
-                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-                "Accept-encoding": "gzip, deflate, br",
-                "Accept-language": "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6",
-                "upgrade-insecure-requests": "1",
-                "User-Agent": $.UA,
-                "Cookie": cookie
-            }
-        };
-        $.get(options, async (err, resp, body) => {
-            try {
-                if (err) {
-                    console.log(`❗️getshopname: API请求失败`)
-                } else {
-                    $.shopName = JSON.stringify(body).match(/shopName:\s?\(\'(.+?)\'\)/) && JSON.stringify(body).match(/shopName:\s?\(\'(.+?)\'\)/)[1] || ''
-                }
-                if ($.shopName) {
-                    $.shopName = $.shopName.replace(/&#39;/g, "\'")
-                    console.log(`店铺${num}：${$.shopName}`)
-                    message += `${$.shopName}\n`
-                } else {
-                    console.log(`getshopname: 获取店铺名失败`)
-                }
-            } catch (e) {
-                $.logErr(e, resp)
-            } finally {
-                resolve();
             }
         })
     })
