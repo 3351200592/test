@@ -351,7 +351,7 @@ async function predictionFruit() {
     console.log('开始预测水果成熟时间\n');
     await initForFarm();
     await taskInitForFarm();
-    if ($.farmInfo && $.farmTask && $.farmTask.totalWaterTaskInit) {
+    if ($.farmInfo?.farmUserPro && $.farmTask?.totalWaterTaskInit) {
         let waterEveryDayT = $.farmTask.totalWaterTaskInit.totalWaterTaskTimes;//今天到到目前为止，浇了多少次水
         message += `【今日共浇水】${waterEveryDayT}次\n`;
         message += `【剩余 水滴】${$.farmInfo.farmUserPro.totalEnergy}g💧\n`;
