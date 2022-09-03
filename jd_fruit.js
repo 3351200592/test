@@ -472,8 +472,9 @@ async function getTenWaterAward() {
 async function doTenWaterAgain() {
     console.log('开始检查剩余水滴能否再次浇水再次浇水\n');
     await initForFarm();
-    if (!$.farmInfo) return
-    let totalEnergy = $.farmInfo.farmUserPro.totalEnergy;
+    // if (!$.farmInfo) return
+    let totalEnergy = $.farmInfo?.farmUserPro?.totalEnergy || ""
+    if (!totalEnergy) return
     console.log(`剩余水滴${totalEnergy}g\n`);
     await myCardInfoForFarm();
     if (!$.myCardInfoRes) return
