@@ -26,11 +26,14 @@ $.myCodes = []
 $.myFronts = []
 $.helpRunout = []
 $.blackIndexs = []
+$.notDoWaters = []
 
 // 互助环境变量1 设定固定车头助力码、大小写逗号隔开、连续多个可直接用 - 、如：1-10，可混用如：1,2,3,7-15
 let helpFronts = $.isNode() ? (process.env.jd_helpFronts ? process.env.jd_helpFronts : []) : []
 // 互助环境变量2 除了固定互助码放前面被助力 之外的账号 设定随机还是顺序助力，true为随机，false为顺序
 let helpRandom = $.isNode() ? (process.env.jd_helpRandom ? process.env.jd_helpRandom : false) : false
+// 互助环境变量3 不浇水的账号pin，&隔开
+let notWaterUsers = $.isNode() ? (process.env.jd_notWaterUsers ? process.env.jd_notWaterUsers : "") : ""
 
 if (helpFronts.length > 0) {
     helpFronts = helpFronts.replace(/，/g, ",").replace(/ /g, "").split(",")
@@ -46,6 +49,12 @@ if (helpFronts.length > 0) {
         } else $.myFronts.push(Number(v))
     }
     $.myFronts = [...new Set($.myFronts)]
+}
+
+if (notWaterUsers) {
+    console.log(notWaterUsers)
+    $.notDoWaters = Array.from(new Set(notWaterUsers.split('&')))
+    for (let t in $.notDoWaters) $.notDoWaters[t] = decodeURIComponent($.notDoWaters[t])
 }
 
 const retainWater = 100;//保留水滴大于多少g,默认100g;
@@ -215,12 +224,14 @@ async function jdFruit() {
                 // return
             }
             await doDailyTask();
-            await doTenWater();//浇水十次
+            if (!$.notDoWaters.includes($.UserName)) await doTenWater();//浇水十次
+            else console.log(`\n已设定该账号不进行浇水，跳过浇水十次执行...\n`)
             await getFirstWaterAward();//领取首次浇水奖励
             await getTenWaterAward();//领取10浇水奖励
             await getWaterFriendGotAward();//领取为2好友浇水奖励
             await duck();
-            await doTenWaterAgain();//再次浇水
+            if (!$.notDoWaters.includes($.UserName)) await doTenWaterAgain();//再次浇水
+            else console.log(`\n已设定该账号不进行浇水，跳过再次浇水执行...\n`)
             await predictionFruit();//预测水果成熟时间
         } else {
             console.log(`初始化农场数据异常, 请登录京东app查看农场是否正常`);
@@ -363,9 +374,9 @@ async function predictionFruit() {
         }
         // 预测n天后水果课可兑换功能
         let waterTotalT = ($.farmInfo.farmUserPro.treeTotalEnergy - $.farmInfo.farmUserPro.treeEnergy - $.farmInfo.farmUserPro.totalEnergy) / 10;//一共还需浇多少次水
-    
+
         let waterD = Math.ceil(waterTotalT / waterEveryDayT);
-    
+
         message += `【预测】${waterD === 1 ? '明天' : waterD === 2 ? '后天' : waterD + '天之后'}(${timeFormat(24 * 60 * 60 * 1000 * waterD + Date.now())}日)可兑换水果🍉`
     }
 }
@@ -497,7 +508,7 @@ async function doTenWaterAgain() {
             console.log(`使用加签卡结果:${JSON.stringify($.userMyCardRes)}`);
         }
         await initForFarm();
-        if (!$.farmInfo) return
+        if (!$.farmInfo?.farmUserPro) return
         totalEnergy = $.farmInfo.farmUserPro.totalEnergy;
     }
     jdFruitBeanCard = $.getdata('jdFruitBeanCard') ? $.getdata('jdFruitBeanCard') : jdFruitBeanCard;
@@ -1530,8 +1541,8 @@ function requireConfig() {
             cookiesArr = [$.getdata('CookieJD'), $.getdata('CookieJD2'), ...jsonParse($.getdata('CookiesJD') || "[]").map(item => item.cookie)].filter(item => !!item);
         }
         console.log(`共${cookiesArr.length}个京东账号\n\n============================================================`)
-        console.log(`你的互助配置如下：\n互助模式：${helpRandom + "" === "true" ? '随机互助' : '顺序互助'}\n优先被助力账号：${$.myFronts.length > 0 ? $.myFronts.toString() : '未设定'}`);
-        console.log(`\n环境变量设置提示：\nexport jd_helpFronts="1,2,3-5" 表示账号12345固定优先被助力\nexport jd_helpRandom="true" 表示固定助力过后全部随机助力、反之顺序助力`);
+        console.log(`你的互助配置如下：\n互助模式：${helpRandom + "" === "true" ? '随机互助' : '顺序互助'}\n优先被助力账号：${$.myFronts.length > 0 ? $.myFronts.toString() : '未设定'}   \n不执行浇水账号：${$.notDoWaters.length > 0 ? $.notDoWaters.toString() : '未设定'}`);
+        console.log(`\n环境变量设置提示：\nexport jd_helpFronts="1,2,3-5" 表示账号12345固定优先被助力\nexport jd_helpRandom="true" 表示固定助力过后全部随机助力、反之顺序助力\nexport jd_notWaterUsers="111&222&333" 表示账号(pin & 隔开) 111、222、333，只做任务、不浇水`);
         console.log(`\n脚本先执行日常任务，最后再执行内部互助\n助力码直接脚本获取，解决助力码过长问题\n助力已满和耗尽的号，会缓存至本地以过滤`);
         console.log(`============================================================`)
         resolve()
