@@ -168,7 +168,7 @@ async function showMsg() {
         else if ($.isPlusVip != 1 && !$.JingXiang)
             ReturnMessage += `${$.levelName}|会员\n`;
     }
-    if ($.JingXiang) ReturnMessage += `${$.JingXiang}\n`;
+    if ($.JingXiang) ReturnMessage += `京享值${$.JingXiang}\n`;
 
     ReturnMessage += `今日收入：${$.todayIncomeBean}京豆、 支出: ${$.todayOutcomeBean}京豆\n`;
     ReturnMessage += `昨日收入：${$.incomeBean}京豆、 支出: ${$.expenseBean}京豆\n`;;
@@ -253,7 +253,7 @@ async function bean() {
         // console.log(`第${page}页: ${JSON.stringify(response)}`);
         if (response && response.code === "0") {
             page++;
-            let detailList = response.detailList;
+            let detailList = response.jingDetailList;
             if (detailList && detailList.length > 0) {
                 for (let item of detailList) {
                     const date = item.date.replace(/-/g, '/') + "+08:00";
@@ -440,7 +440,7 @@ function TotalBean() {
         $.get(options, (err, resp, data) => {
             try {
                 if (err) {
-                    $.logErr(err)
+                    console.log("TotalBean请求失败:", JSON.stringify(err))
                 } else {
                     if (data) {
                         data = JSON.parse(data);
@@ -474,38 +474,38 @@ function TotalBean() {
 
 function TotalBean2() {
     return new Promise(async (resolve) => {
+        let UA = getUA()
         const options = {
-            url: `https://wxapp.m.jd.com/kwxhome/myJd/home.json?&useGuideModule=0&bizId=&brandId=&fromType=wxapp&timestamp=${Date.now()}`,
+            url: `https://wq.jd.com/user/info/QueryJDUserInfo?sceneval=2`,
             headers: {
                 Cookie: cookie,
-                'content-type': `application/x-www-form-urlencoded`,
-                Connection: `keep-alive`,
-                'Accept-Encoding': `gzip,compress,br,deflate`,
-                Referer: `https://servicewechat.com/wxa5bf5ee667d91626/161/page-frame.html`,
-                Host: `wxapp.m.jd.com`,
-                'User-Agent': `Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/8.0.10(0x18000a2a) NetType/WIFI Language/zh_CN`,
+                "Host": "wq.jd.com",
+                "Connection": "keep-alive",
+                "Content-Type": "application/x-www-form-urlencoded;",
+                "Accept-Encoding": "gzip, deflate, br",
+                'Referer': 'https://wqs.jd.com/',
+                'User-Agent': UA,
             },
         };
         $.post(options, (err, resp, data) => {
             try {
                 if (err) {
-                    $.logErr(err);
+                    console.log("TotalBean2请求失败:", JSON.stringify(err))
                 } else {
                     if (data) {
                         data = JSON.parse(data);
-                        if (!data.user) {
-                            $.isLogin = false; //cookie过期
-                            return;
-                        }
-                        const userInfo = data.user;
-                        if (userInfo) {
+                        // if (!data.user) {
+                        //     $.isLogin = false; //cookie过期
+                        //     return;
+                        // }
+                        if (data?.base) {
                             if (!$.nickName)
-                                $.nickName = userInfo.unickName;
+                                $.nickName = data.base.nickname || ""
                             if ($.beanCount == 0) {
-                                $.beanCount = userInfo.jingBean;
-                                $.isPlusVip = 3;
+                                $.beanCount = data.base.jdNum || 0
                             }
-                            $.JingXiang = userInfo.uclass;
+                            $.isPlusVip = data.isPlusVip ? 1 : 3
+                            $.JingXiang = data.base.jvalue || ""
                         }
                     } else {
                         $.log('京东服务器返回空数据');
@@ -524,12 +524,11 @@ function TotalBean2() {
 function getJingBeanBalanceDetail(page) {
     return new Promise(async resolve => {
         const options = {
-            "url": `https://api.m.jd.com/client.action?functionId=getJingBeanBalanceDetail`,
-            "body": `body=${escape(JSON.stringify({ "pageSize": "20", "page": page.toString() }))}&appid=ld`,
+            "url": `https://bean.m.jd.com/beanDetail/detail.json?page=${page}`,
             "headers": {
                 'User-Agent': $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1"),
-                'Host': 'api.m.jd.com',
-                'Content-Type': 'application/x-www-form-urlencoded',
+                "Connection": 'keep-alive',
+                "Content-Type": "application/x-www-form-urlencoded;",
                 'Cookie': cookie,
             }
         }
@@ -992,7 +991,7 @@ function getAccBalance() {
     return new Promise(resolve => {
         let options = {
             url: `https://ms.jr.jd.com/gw/generic/jrm/h5/m/queryUserAccBalance`,
-            body:`reqData=&source=jrm`,
+            body: `reqData=&source=jrm`,
             headers: {
                 "Accept": "*/*",
                 "Accept-Language": "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7",
@@ -1030,7 +1029,7 @@ function getBalance() {
     return new Promise(resolve => {
         let options = {
             url: `https://ms.jr.jd.com/gw/generic/base/h5/m/queryBalance`,
-            body:`reqData=&source=jrm`,
+            body: `reqData=&source=jrm`,
             headers: {
                 "Accept": "*/*",
                 "Accept-Language": "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7",
@@ -1339,6 +1338,10 @@ function GetCommodityDetails() {
             }
         })
     })
+}
+
+function getUA() {
+    return `jdapp;iPhone;11.1.4;14.3;${randomString(40)};network/wifi;model/iPhone12,1;addressid/3364463029;appBuild/168210;jdSupportDarkMode/0;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1`
 }
 
 
