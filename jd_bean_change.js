@@ -80,6 +80,11 @@ if (Authorization && Authorization.indexOf("Bearer ") === -1) Authorization = `B
             $.eCardNum = 0
             $.AccBalance = ""
             $.WalletBalance = ""
+            $.isPlusVip = 0
+            $.totalScore = 0
+            $.levelName = ""
+            $.JingXiang = ""
+            getUA()
 
             await TotalBean();
             await TotalBean2();
@@ -113,6 +118,7 @@ if (Authorization && Authorization.indexOf("Bearer ") === -1) Authorization = `B
             await getECard()
             await getAccBalance()
             await getBalance()
+            await queryScore()
             await showMsg();
         }
         if ($.isNode() && notifyTip && allMessage) {
@@ -144,31 +150,28 @@ async function showMsg() {
     ReturnMessage = `📣=============账号${$.index}=============📣\n`
     ReturnMessage += `账号名称：${$.nickName || $.UserName}\n`;
 
-    if ($.levelName || $.JingXiang) ReturnMessage += `账号信息：`;
-    if ($.levelName) {
-        if ($.levelName.length > 2) $.levelName = $.levelName.substring(0, 2);
-
-        if ($.levelName == "注册")
-            $.levelName = `😊普通`;
-        else if ($.levelName == "金牌")
-            $.levelName = `🥇金牌`;
-        else if ($.levelName == "银牌")
-            $.levelName = `🥈银牌`;
-        else if ($.levelName == "铜牌")
-            $.levelName = `🥉铜牌`;
-        else if ($.levelName == "钻石")
-            $.levelName = `💎钻石`;
-
-        if ($.isPlusVip == 1 && $.JingXiang)
-            ReturnMessage += `${$.levelName}|Plus，`;
-        else if ($.isPlusVip == 1 && !$.JingXiang)
-            ReturnMessage += `${$.levelName}|Plus\n`;
-        else if ($.isPlusVip != 1 && $.JingXiang)
-            ReturnMessage += `${$.levelName}|会员，`;
-        else if ($.isPlusVip != 1 && !$.JingXiang)
-            ReturnMessage += `${$.levelName}|会员\n`;
+    if ($.levelName || $.isPlusVip || $.JingXiang) {
+        ReturnMessage += `账号信息：`
+        let msg = ""
+        if ($.levelName) {
+            if ($.levelName.length > 2) $.levelName = $.levelName.substring(0, 2)
+            if ($.levelName == "注册") $.levelName = `普通`
+                // $.levelName = `😊普通`;
+            // else if ($.levelName == "金牌")
+            //     $.levelName = `🥇金牌`;
+            // else if ($.levelName == "银牌")
+            //     $.levelName = `🥈银牌`;
+            // else if ($.levelName == "铜牌")
+            //     $.levelName = `🥉铜牌`;
+            // else if ($.levelName == "钻石")
+            //     $.levelName = `💎钻石`;
+            $.levelName = `${$.levelName}|`
+        }
+        msg = $.isPlusVip == 1 ? `${$.levelName}Plus` : `${$.levelName}会员`
+        msg = $.totalScore ? `${msg}(${$.totalScore}分)` : msg
+        msg = $.JingXiang ? `${msg},京享值${$.JingXiang}\n` : `${msg}\n`
+        ReturnMessage += msg
     }
-    if ($.JingXiang) ReturnMessage += `京享值${$.JingXiang}\n`;
 
     ReturnMessage += `今日收入：${$.todayIncomeBean}京豆、 支出: ${$.todayOutcomeBean}京豆\n`;
     ReturnMessage += `昨日收入：${$.incomeBean}京豆、 支出: ${$.expenseBean}京豆\n`;;
@@ -474,7 +477,7 @@ function TotalBean() {
 
 function TotalBean2() {
     return new Promise(async (resolve) => {
-        let UA = getUA()
+
         const options = {
             url: `https://wq.jd.com/user/info/QueryJDUserInfo?sceneval=2`,
             headers: {
@@ -484,7 +487,7 @@ function TotalBean2() {
                 "Content-Type": "application/x-www-form-urlencoded;",
                 "Accept-Encoding": "gzip, deflate, br",
                 'Referer': 'https://wqs.jd.com/',
-                'User-Agent': UA,
+                'User-Agent': $.UA,
             },
         };
         $.post(options, (err, resp, data) => {
@@ -1025,6 +1028,33 @@ function getAccBalance() {
     });
 }
 
+function queryScore() {
+    return new Promise(resolve => {
+        let options = {
+            url: `https://rsp.jd.com/windControl/queryScore/v1?lt=m&an=plus.mobile&stamp=${Date.now()}`,
+            headers: {
+              'Cookie': cookie,
+              'User-Agent': $.UA,
+              'Referer': 'https://plus.m.jd.com/rights/windControl'
+            }
+        };
+        $.get(options, async (err, resp, data) => {
+            try {
+                if (err) {
+                    // console.log(err);
+                } else {
+                    let res = $.toObj(data, data)
+                    if (res.code == 1000) $.totalScore = res.rs?.userSynthesizeScore?.totalScore || 0
+                }
+            } catch (e) {
+                console.log(e, resp);
+            } finally {
+                resolve();
+            }
+        });
+    });
+}
+
 function getBalance() {
     return new Promise(resolve => {
         let options = {
@@ -1341,7 +1371,7 @@ function GetCommodityDetails() {
 }
 
 function getUA() {
-    return `jdapp;iPhone;11.1.4;14.3;${randomString(40)};network/wifi;model/iPhone12,1;addressid/3364463029;appBuild/168210;jdSupportDarkMode/0;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1`
+    $.UA = `jdapp;iPhone;11.1.4;14.3;${randomString(40)};network/wifi;model/iPhone12,1;addressid/3364463029;appBuild/168210;jdSupportDarkMode/0;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1`
 }
 
 
