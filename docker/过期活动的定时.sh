@@ -1,5 +1,8 @@
 ####################过期活动的定时####################
 
+# 京喜牧场
+13 0-23/3 * * * node /scripts/jd_jxmc.js >> /scripts/logs/jd_jxmc.log 2>&1
+
 # 东东电竞经理
 15 10 * * * node /scripts/jd_Elecsport.js >> /scripts/logs/jd_Elecsport.log 2>&1
 
