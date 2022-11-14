@@ -155,7 +155,6 @@ const urlSchema = `openjd://virtual?params=%7B%20%22category%22:%20%22jump%22,%2
                 console.log(`\n\n***************** 每5个账号休息1分钟、已用时${parseInt((new Date().getTime() - $.theStart) / 1000)}秒 *****************\n`)
                 await $.wait(parseInt(Math.random() * 5000 + 60000, 10))
             }
-            // break
         }
 
         //if ($.isNode() && thefs.existsSync(thepath) && notifyTip && allMessage && $.ctrTemp){
@@ -166,7 +165,6 @@ const urlSchema = `openjd://virtual?params=%7B%20%22category%22:%20%22jump%22,%2
     }
 
     console.log(`\n\n***************** 日常任务结束、已用时${parseInt((new Date().getTime() - $.theStart) / 1000)}秒 *****************`)
-    // return
     await getCodesCache()
 
     console.log(`\n\n\n======================= 开始互助 =======================`);
