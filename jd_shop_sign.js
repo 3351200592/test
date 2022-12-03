@@ -143,7 +143,8 @@ function getvenderId(token) {
                 "cookie": cookie,
                 "referer": 'https://h5.m.jd.com/',
                 "User-Agent": $.UA
-            }
+            },
+            timeout: 20000
         }
         $.get(options, (err, resp, data) => {
             try {
@@ -185,7 +186,8 @@ function getvenderName(venderId) {
                 "accept-language": "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7",
                 "cookie": cookie,
                 "User-Agent": $.UA
-            }
+            },
+            timeout: 20000
         }
         $.get(options, (err, resp, data) => {
             try {
@@ -224,7 +226,8 @@ function getActivityInfo(token, venderId) {
                 "cookie": cookie,
                 "referer": `https://h5.m.jd.com/babelDiy/Zeus/2PAAf74aG3D61qvfKUM5dxUssJQ9/index.html?token=${token}&sceneval=2&jxsid=16178634353215523301&cu=true&utm_source=kong&utm_medium=jingfen&utm_campaign=t_2009753434_&utm_term=fa3f8f38c56f44e2b4bfc2f37bce9713`,
                 "User-Agent": $.UA
-            }
+            },
+            timeout: 20000
         }
         $.get(options, (err, resp, data) => {
             try {
@@ -273,7 +276,8 @@ function signCollectGift(token, venderId, activitytemp) {
                 "cookie": cookie,
                 "referer": `https://h5.m.jd.com/babelDiy/Zeus/2PAAf74aG3D61qvfKUM5dxUssJQ9/index.html?token=${token}&sceneval=2&jxsid=16105853541009626903&cu=true&utm_source=kong&utm_medium=jingfen&utm_campaign=t_1001280291_&utm_term=fa3f8f38c56f44e2b4bfc2f37bce9713`,
                 "User-Agent": $.UA
-            }
+            },
+            timeout: 20000
         }
         $.get(options, (err, resp, data) => {
             try {
@@ -330,7 +334,8 @@ function taskUrl(token, venderId) {
                 "cookie": cookie,
                 "referer": `https://h5.m.jd.com/`,
                 "User-Agent": $.UA
-            }
+            },
+            timeout: 20000
         }
         $.get(options, (err, resp, data) => {
             try {
@@ -374,7 +379,8 @@ function TotalBean() {
                 "Accept-Language": "zh-cn",
                 "Referer": "https://home.m.jd.com/myJd/newhome.action?sceneval=2&ufc=&",
                 "Accept-Encoding": "gzip, deflate, br"
-            }
+            },
+            timeout: 20000
         }
         $.get(options, (err, resp, data) => {
             try {
