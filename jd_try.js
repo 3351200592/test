@@ -245,9 +245,14 @@ let args_xh = {
                     await $.wait(3000);
                 }
             }
-            if ($.isForbidden === false && $.isLimit === false) {
-                console.log(`\n稍后将执行试用申请，请等待 2 秒\n`)
-                await $.wait(2000);
+            if ($.isLimit === false) {
+                if ($.isForbidden == true || $.wrong == true) {
+                    console.log(`\n稍后将执行试用申请，请等待 30 秒\n`)
+                    await $.wait(30000);
+                } else {
+                    console.log(`\n稍后将执行试用申请，请等待 2 秒\n`)
+                    await $.wait(2000);
+                }
                 for (let i = 0; i < trialActivityIdList.length && $.isLimit === false; i++) {
                     if ($.isLimit) {
                         console.log("试用上限")
@@ -356,8 +361,7 @@ function try_tabList() {
                         $.isForbidden = true
                         console.log('账号被京东服务器风控，不再请求该帐号')
                     } else {
-                        console.log(JSON.stringify(err))
-                        console.log(`${$.name} API请求失败，请检查网路重试`)
+                        console.log(`try_tabList API请求失败 ${JSON.stringify(err)}`)
                     }
                 } else {
                     data = JSON.parse(data)
@@ -396,8 +400,7 @@ function try_feedsList(tabId, page) {
                         $.retrynum++
                         if ($.retrynum === 3) { $.isForbidden = true; $.log('多次尝试失败，换个时间再试！') }
                     } else {
-                        console.log(JSON.stringify(err))
-                        console.log(`${$.name} API请求失败，请检查网路重试`)
+                        console.log(`try_feedsList API请求失败 ${JSON.stringify(err)}`)
                     }
                 } else {
                     data = JSON.parse(data)
@@ -484,7 +487,8 @@ function try_feedsList(tabId, page) {
                         }
                         $.retrynum = 0
                     } else {
-                        console.log(`💩 获得试用列表失败: ${data.message}`)
+                        console.log(`💩 获得试用列表失败: ${data.message || JSON.stringify(data)}`)
+                        if (data.message && /service default/g.test(data.message)) $.wrong = true
                     }
                 }
             } catch (e) {
@@ -523,8 +527,7 @@ async function try_apply(title, activityId, flag = 0) {
                         }
 
                     } else {
-                        console.log(JSON.stringify(err))
-                        console.log(`${$.name} API请求失败，请检查网路重试`)
+                        console.log(`申请使用 API请求失败 ${JSON.stringify(err)}`)
                     }
                 } else {
                     $.totalTry++
@@ -593,6 +596,7 @@ function try_MyTrials(page, selected) {
                 'referer': 'https://prodev.m.jd.com/',
                 'cookie': $.cookie + $.jda
             },
+            timeout: 20000
         }
         $.post(options, (err, resp, data) => {
             try {
@@ -641,6 +645,7 @@ function taskurl_xh(appid, functionId, body = JSON.stringify({})) {
             'Accept-Language': 'zh-cn',
             'Content-Type': 'application/x-www-form-urlencoded',
         },
+        timeout: 20000
     }
 }
 
@@ -702,8 +707,7 @@ function totalBean() {
         $.post(options, (err, resp, data) => {
             try {
                 if (err) {
-                    console.log(`${JSON.stringify(err)}`)
-                    console.log(`${$.name} API请求失败，请检查网路重试`)
+                    console.log(`totalBean API请求失败 ${JSON.stringify(err)}`)
                 } else {
                     if (data) {
                         data = JSON.parse(data);
@@ -887,7 +891,8 @@ function Env(name, opts) {
                     headers: {
                         'X-Key': key,
                         'Accept': '*/*'
-                    }
+                    },
+                    timeout: 20000
                 }
                 this.post(opts, (err, resp, body) => resolve(body))
             }).catch((e) => this.logErr(e))
