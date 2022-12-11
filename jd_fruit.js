@@ -403,7 +403,7 @@ async function jdFruit() {
             else console.log(`\n已设定该账号不进行浇水，跳过再次浇水执行...\n`)
             await predictionFruit();//预测水果成熟时间
         } else {
-            console.log($.farmInfo)
+            if ($.farmInfo) console.log(`${'treeState： ' + $.farmInfo.treeState || ''}`)
             console.log(`初始化农场数据异常, 请登录京东app查看农场是否正常`);
             message += `数据异常, 请登录京东app查看农场是否正常\n`;
             if (!$.blackIndexs.includes($.index)) $.blackIndexs.push($.index)
