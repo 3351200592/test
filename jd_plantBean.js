@@ -153,8 +153,8 @@ let h5stTool = {
             $.heplTimes = $.heplTimes + 1
             await doHelp(); //助力
             if ($.heplTimes % 5 == 0) {
-                console.log(`\n\n***************** 每请求5个账号休息1分钟、已用时${parseInt((new Date().getTime() - $.theStart) / 1000)}秒 *****************\n`)
-                await $.wait(parseInt(Math.random() * 5000 + 60000, 10))
+                console.log(`\n\n***************** 每请求5个账号休息半分钟、已用时${parseInt((new Date().getTime() - $.theStart) / 1000)}秒 *****************\n`)
+                await $.wait(parseInt(Math.random() * 5000 + 30000, 10))
             }
         }
     }
@@ -244,7 +244,7 @@ async function jdPlantBean(f = 0) {
 }
 
 async function doGetReward() {
-    console.log(`【上轮京豆】${awardState === '4' ? '采摘中' : awardState === '5' ? '可收获了' : '已领取'}`);
+    console.log(`\n【上轮京豆】${awardState === '4' ? '采摘中' : awardState === '5' ? '可收获了' : '已领取'}`);
     if (awardState === '4') {
         //京豆采摘中...
         message += `【上期状态】${roundList[num - 1].tipBeanEndTitle}\n`;
@@ -304,7 +304,7 @@ async function stealFriendWater(f = 0) {
     await stealFriendList();
     if ($.stealFriendList && $.stealFriendList.code === '0') {
         if ($.stealFriendList.data && $.stealFriendList.data.tips) {
-            console.log('\n\n今日偷取好友营养液已达上限\n\n');
+            console.log('\n\n今日偷取好友营养液已达上限\n');
             return
         }
         if ($.stealFriendList.data && $.stealFriendList.data.friendInfoList && $.stealFriendList.data.friendInfoList.length > 0) {
@@ -541,27 +541,28 @@ async function doTask() {
     }
 }
 
-function showTaskProcess(f = 0) {
+function showTaskProcess() {
     return new Promise(async resolve => {
         $.taskList = []
-        await plantBeanIndex();
         if ($.plantBeanIndexResult && $.plantBeanIndexResult.data) {
             $.taskList = $.plantBeanIndexResult.data.taskList;
-            if ($.taskList && $.taskList.length > 0) {
-                console.log("     任务   进度");
-                for (let item of $.taskList) {
-                    console.log(`[${item["taskName"]}]  ${item["gainedNum"]}/${item["totalNum"]}   ${item["isFinished"]}`);
+        } else {
+            for (let f = 0; f < 3; f++) {
+                await plantBeanIndex();
+                let r = $.plantBeanIndexResult
+                if (r && ((r.errorMessage && /营养液不见了/g.test(r.errorMessage)) || Number(r.code) == 413)) {
+                    console.log(`plantBeanIndexResult请求失败、重试第${f + 1}次....`)
+                    await $.wait(3000)
+                } else {
+                    if ($.plantBeanIndexResult && $.plantBeanIndexResult.data) $.taskList = $.plantBeanIndexResult.data.taskList;
+                    break
                 }
             }
-        } else {
-            let r = $.plantBeanIndexResult
-            if (f < 4 && r && ((r.errorMessage && /营养液不见了/g.test(r.errorMessage)) || Number(r.code) == 413)) {
-                f = f + 1
-                console.log(`plantBeanIndexResult请求失败、重试第${f}次....`)
-                await $.wait(3000)
-                await showTaskProcess(f)
-            } else {
-                console.log(`plantBeanIndexResult:${JSON.stringify(r)}`)
+        }
+        if ($.taskList && $.taskList.length > 0) {
+            console.log("\n     任务   进度");
+            for (let item of $.taskList) {
+                console.log(`[${item["taskName"]}]  ${item["gainedNum"]}/${item["totalNum"]}   ${item["isFinished"]}`);
             }
         }
         resolve()
