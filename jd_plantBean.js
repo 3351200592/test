@@ -110,8 +110,8 @@ let h5stTool = {
             await jdPlantBean();
             await showMsg();
             if ($.index % 5 == 0) {
-                console.log(`\n\n***************** 每5个账号休息1分钟、已用时${parseInt((new Date().getTime() - $.theStart) / 1000)}秒 *****************`)
-                await $.wait(parseInt(Math.random() * 5000 + 60000, 10))
+                console.log(`\n\n***************** 每5个账号休息半分钟、已用时${parseInt((new Date().getTime() - $.theStart) / 1000)}秒 *****************`)
+                await $.wait(parseInt(Math.random() * 5000 + 30000, 10))
             }
         }
     }
@@ -153,8 +153,8 @@ let h5stTool = {
             $.heplTimes = $.heplTimes + 1
             await doHelp(); //助力
             if ($.heplTimes % 5 == 0) {
-                console.log(`\n\n***************** 每请求5个账号休息1分钟、已用时${parseInt((new Date().getTime() - $.theStart) / 1000)}秒 *****************\n`)
-                await $.wait(parseInt(Math.random() * 5000 + 60000, 10))
+                console.log(`\n\n***************** 每请求5个账号休息半分钟、已用时${parseInt((new Date().getTime() - $.theStart) / 1000)}秒 *****************\n`)
+                await $.wait(parseInt(Math.random() * 5000 + 30000, 10))
             }
         }
     }
