@@ -372,15 +372,22 @@ async function jdFruit() {
                 console.log(`${$.fuitName}种植中...`)
             } else if ($.farmInfo.treeState === 0) {
                 //已下单购买, 但未开始种植新的水果
-                option['open-url'] = urlSchema;
-                $.msg($.name, ``, `【京东账号${$.index}】 ${$.nickName || $.UserName}\n【提醒⏰】您忘了种植新的水果\n请去京东APP选购并种植新的水果\n入口：京东APP-我的-东东农场`, option);
-                if ($.isNode()) {
-                    await notify.sendNotify(`${$.name} - 您忘了种植新的水果`, `京东账号${$.index} ${$.nickName}\n【提醒⏰】您忘了种植新的水果\n请去京东APP选购并种植新的水果\n入口：京东APP-我的-东东农场`);
+                let ff = false
+                if ($.farmAutoFlag === true) {
+                    console.log(`\n未种植，开始随机种植....\n`)
+                    ff = await plantFruit()
                 }
+                if (!ff) {
+                    option['open-url'] = urlSchema;
+                    $.msg($.name, ``, `【京东账号${$.index}】 ${$.nickName || $.UserName}\n【提醒⏰】您忘了种植新的水果\n请去京东APP选购并种植新的水果\n入口：京东APP-我的-东东农场`, option);
+                    if ($.isNode()) {
+                        await notify.sendNotify(`${$.name} - 您忘了种植新的水果`, `京东账号${$.index} ${$.nickName}\n【提醒⏰】您忘了种植新的水果\n请去京东APP选购并种植新的水果\n入口：京东APP-我的-东东农场`);
+                    }
 
-                if ($.isNode() && thefs.existsSync(thepath) && notifyTip) {
-                    let thenotify = $.isNode() ? require(thepath) : '';
-                    await thenotify.sendNotify(`${$.name} - 您忘了种植新的水果`, `京东账号${$.index} ${$.nickName}\n【提醒⏰】您忘了种植新的水果\n请去京东APP选购并种植新的水果\n入口：京东APP-我的-东东农场`);
+                    if ($.isNode() && thefs.existsSync(thepath) && notifyTip) {
+                        let thenotify = $.isNode() ? require(thepath) : '';
+                        await thenotify.sendNotify(`${$.name} - 您忘了种植新的水果`, `京东账号${$.index} ${$.nickName}\n【提醒⏰】您忘了种植新的水果\n请去京东APP选购并种植新的水果\n入口：京东APP-我的-东东农场`);
+                    }
                 }
 
                 // return
