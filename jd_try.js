@@ -200,7 +200,8 @@ let args_xh = {
             $.isLogin = true;
             $.nickName = '';
             if ($.runArr.length && !$.runArr.includes($.index)) continue
-            await totalBean();
+            await getUA()
+            await TotalBean();
             console.log(`\n开始【京东账号${$.index}】${$.nickName || $.UserName}\n`);
             if (!$.isLogin) {
                 $.msg($.name, `【提示】cookie已失效`, `京东账号${$.index} ${$.nickName || $.UserName}\n请重新登录获取\nhttps://bean.m.jd.com/bean/signIndex.action`, {
@@ -244,6 +245,7 @@ let args_xh = {
                     console.log(`间隔等待中，请等待 3 秒\n`)
                     await $.wait(3000);
                 }
+                if ($.wrong) break
             }
             if ($.isLimit === false) {
                 if ($.isForbidden == true || $.wrong == true) {
@@ -688,44 +690,42 @@ async function showMsg() {
     }
 }
 
-function totalBean() {
+function TotalBean() {
     return new Promise(async resolve => {
         const options = {
-            "url": `https://wq.jd.com/user/info/QueryJDUserInfo?sceneval=2`,
-            "headers": {
-                "Accept": "application/json,text/plain, */*",
-                "Content-Type": "application/x-www-form-urlencoded",
-                "Accept-Encoding": "gzip, deflate, br",
-                "Accept-Language": "zh-cn",
+            url: "https://me-api.jd.com/user_new/info/GetJDUserInfoUnion",
+            headers: {
+                "Host": "me-api.jd.com",
+                "Accept": "*/*",
                 "Connection": "keep-alive",
                 "Cookie": $.cookie,
-                "Referer": "https://wqs.jd.com/my/jingdou/my.shtml?sceneval=2",
-                "User-Agent": $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1")
-            },
-            "timeout": 10000,
+                "User-Agent": $.UA,
+                "Accept-Language": "zh-cn",
+                "Referer": "https://home.m.jd.com/myJd/newhome.action?sceneval=2&ufc=&",
+                "Accept-Encoding": "gzip, deflate, br"
+            }
         }
-        $.post(options, (err, resp, data) => {
+        $.get(options, (err, resp, data) => {
             try {
                 if (err) {
-                    console.log(`totalBean API请求失败 ${JSON.stringify(err)}`)
+                    console.log(`TotalBean 请求失败 ${$.toStr(err)}`)
                 } else {
-                    if (data) {
-                        data = JSON.parse(data);
-                        if (data['retcode'] === 13) {
+                    let res = $.toObj(data, data)
+                    if (typeof res == 'object') {
+                        if (res.retcode === "1001") {
                             $.isLogin = false; //cookie过期
-                            return
-                        }
-                        if (data['retcode'] === 0) {
-                            $.nickName = (data['base'] && data['base'].nickname) || $.UserName;
+                            return;
+                        } else if (res.retcode === "0" && res.data && res.data.hasOwnProperty("userInfo")) {
+                            $.nickName = res.data.userInfo.baseInfo.nickname
                         } else {
-                            $.nickName = $.UserName
+
                         }
                     } else {
-                        console.log(`京东服务器返回空数据`)
+                        console.log(`TotalBean 京东服务器返回空数据`)
                     }
                 }
             } catch (e) {
-                $.logErr(e, resp)
+                $.logErr(e)
             } finally {
                 resolve();
             }
@@ -751,6 +751,18 @@ function _jda(format = 'xxxxxxxxxxxxxxxxxxxx') {
         jdaid = v.toString()
         return jdaid;
     });
+}
+
+async function getUA() {
+    $.UA = `jdapp;iPhone;11.1.4;14.3;${randomString(40)};network/wifi;model/iPhone12,1;addressid/3364463029;appBuild/168210;jdSupportDarkMode/0;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1`
+}
+
+function randomString(e) {
+    e = e || 32;
+    let t = "abcdef0123456789", a = t.length, n = "";
+    for (i = 0; i < e; i++)
+        n += t.charAt(Math.floor(Math.random() * a));
+    return n
 }
 
 const generateRandomInteger = (min, max = 0) => {
