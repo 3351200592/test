@@ -1880,7 +1880,7 @@ function safeGet(data) {
 
 async function taskUrl(function_id, body = {}) {
     let h5st = ''
-    let body_in = { "version": 18, "channel": 1, "babelChannel": 0 }
+    let body_in = { "version": 18, "channel": 1, "babelChannel": 10 }
     body_in = { ...body, ...body_in }
     let h5st_body = {
         appid: 'signed_wh5',
