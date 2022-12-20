@@ -1,13 +1,5 @@
 /*
-如需运行请自行添加环境变量：JD_TRY，值填 true 即可运行
-脚本兼容: Node.js
-X1a0He留
-脚本是否耗时只看args_xh.maxLength的大小
-上一作者说了每天最多300个商店，总上限为500个，jd_unsubscribe.js我已更新为批量取关版
-请提前取关至少250个商店确保京东试用脚本正常运行
 16 2 * * * jd_try.js
-@Address: https://github.com/X1a0He/jd_scripts_fixed/blob/main/jd_try_xh.js
-@LastEditors: X1a0He
 */
 const $ = new Env('京东试用')
 const URL = 'https://api.m.jd.com/client.action'
@@ -32,6 +24,11 @@ if (runIndexs.length) {
         } else $.runArr.push(Number(v))
     }
     $.runArr = [...new Set($.runArr)]
+}
+
+let h5stTool = {
+    "try_feedsList": "8f1e3",
+    "try_apply": "a8ade"
 }
 
 
@@ -183,6 +180,43 @@ let args_xh = {
 
 
 !(async () => {
+    let token = 'eacgsysoq6tji4g0' // token
+    $.token = process.env.gua_log_token || token // token
+    if (!$.token) {
+        console.log('请填写 gua_log_token')
+        return
+    }
+    console.log("TOKEN：" + $.token.replace(/.+(.{5})/, '***$1') + "\n")
+    let urlArr = [
+        // "http://127.0.0.1",
+        "http://g.zxi7.cn",
+        "https://jd.smiek.tk",
+        "http://jd.smiek.ga:3001",
+        "http://jd.smiek.ga",
+    ]
+    if ($.logUrl && urlArr.includes($.logUrl)) {
+        var newarr = []
+        newarr.push($.logUrl)
+        for (let u of urlArr) {
+            if (u && !newarr.includes(u)) {
+                newarr.push(u)
+            }
+        }
+        urlArr = newarr
+    }
+    $.getSignUrl = urlArr[0]
+    for (let i of urlArr) {
+        $.getSignUrl = i
+        await toStatus()
+        if ($.toStatus) break
+    }
+    if (!$.toStatus) {
+        console.log($.getSignErr)
+        console.log(`无法连接服务器，请检查网络`)
+        console.log(`多次请求都无法连接服务器地址：${urlArr[0]}，请添加到代理`)
+        return
+    }
+
     $.theStart = new Date().getTime()
     await requireConfig()
     if (!$.cookiesArr[0]) {
@@ -348,14 +382,14 @@ function requireConfig() {
 }
 
 //获取tabList的，如果不知道tabList有哪些，跑一遍这个function就行了
-function try_tabList() {
-    return new Promise((resolve, reject) => {
+async function try_tabList() {
+    return new Promise(async (resolve, reject) => {
         console.log(`获取tabList中...`)
         const body = JSON.stringify({
             "version": 2,
             "previewTime": ""
         });
-        let option = taskurl_xh('newtry', 'try_tabList', body)
+        let option = await taskurl_xh('newtry', 'try_tabList', body)
         $.post(option, (err, resp, data) => {
             try {
                 if (err) {
@@ -383,8 +417,8 @@ function try_tabList() {
 }
 
 //获取商品列表并且过滤 By X1a0He
-function try_feedsList(tabId, page) {
-    return new Promise((resolve, reject) => {
+async function try_feedsList(tabId, page) {
+    return new Promise(async (resolve, reject) => {
         const body = JSON.stringify({
             "tabId": `${tabId}`,
             "page": page,
@@ -393,10 +427,11 @@ function try_feedsList(tabId, page) {
             "client": "app",
             //"previewTime": ""
         });
-        let option = taskurl_xh('newtry', 'try_feedsList', body)
+        let option = await taskurl_xh('newtry', 'try_feedsList', body)
         $.post(option, (err, resp, data) => {
             try {
                 if (err) {
+                    console.log(err)
                     if (JSON.stringify(err) === `\"Response code 403 (Forbidden)\"`) {
                         console.log(`请求失败，第 ${$.retrynum + 1} 次重试`)
                         $.retrynum++
@@ -511,7 +546,7 @@ async function try_apply(title, activityId, flag = 0) {
             "activityId": activityId,
             "previewTime": ""
         });
-        let option = taskurl_xh('newtry', 'try_apply', body)
+        let option = await taskurl_xh('newtry', 'try_apply', body)
         $.get(option, async (err, resp, data) => {
             try {
                 if (err) {
@@ -634,14 +669,28 @@ function try_MyTrials(page, selected) {
     })
 }
 
-function taskurl_xh(appid, functionId, body = JSON.stringify({})) {
-    return {
-        "url": `${URL}?appid=${appid}&functionId=${functionId}&clientVersion=10.3.4&client=wh5&body=${encodeURIComponent(body)}&h5st=''`,
-        'headers': {
+async function taskurl_xh(appid, functionId, body = {}) {
+    let joyLog = functionId == "try_apply" ? `&joylog=ae0e011f02b8a7c94a4a2ff9bddb2d6f*1670920105438~1w3xFsvLauOMDJCakJESzAxMQ==.c1x1dHJwWnJ8fHNTcToHLF03cHwkBXQlNXNGA2h8bls8dTVzFDMoOSE7Fwd/Fx47CCobHQk+KXMfDgIsPFhxaHlxFA==.56ebb2e2~7,1~7B38FD65C9533C915F48B1BE96F269A07678996C~0ioflp0~C~ShFAXxMKaG0fEERdXREKaBdXAR4EeRx6axh3cnEfAR0CAAMcRxIfF1cDHgR5HHprGHd1eB8BHQIAAxxHEh8XVwUeBHkcemsYd3VlH0UfRhJuHBFXQVsRDgIcEUNCEQ4QAAYEAAoAAAMIBAECDQoFBAURHBNEUVYTChFER0ZER1ZGVhEZEUNWUREKE1VSRkVER0VSUxIfEkNUXRcJbwABHwcEHwUGHQgfAR8HbR8SWVoRDwIYEVNAEgsRDQZTB1IIBQADVlUEBFdXAgwKU1ABB1AHVAQFBwMEUwERHBFeQxcJFn9ZXUVJE1VTQ1NbBgcQHBFEEQoCAwQECgIDAQEGAAEJHBFaWBAKER0eBAJWBA0GCVcEVQAMUQEJUh1VC1NRAQEJUlcCAgEJV1FUUgAFAwcCBAQKBVYCBFNRBwENUQEKEh0RUkJTEgkSQl5CUGFmcwdgR01/UWpHeklWA0R8dVcRHhJdRhEKEXJcW1RcVhB4XVccExwRXlJEEgkSCggGBwQWHxJAU0MRDmkIAQYcBwMCbhwRQlwXCW8RfVoQAAIWHhNRXVRBXVlXEh8SAgcRGBEBAh4CHQIQHRIKCAYABxEcEQQABAAHBQcACQIGBwsCBAUdBwEEBQMACAAGBQQACQABBxEYEAASbhwRW19SEgkSVVNVUlVWR0QTHxZTWxIJEkYQHBFTWhIJF0QAHQAdBRMfFlFXb0USCRAAAhIfElFREQ4RQlJeVVxZD1BVA1UDAwFVAAFSC1QEVwoEUgRQAVJUCFJXVFEAVAVWERwRWFkWCWsBHAEfBG8dElFcXFUSCRICBgQFCgYDAAsDCQoDTABTR2lWU0FwXXRRfnF5TGF1dQFQZ3VLfFcODR1jeHkCYWZxdFVsX3JkdXMCUFVFUXZyA2tkZUdieGtddHJEVFx/AF9wamllHGFLVnF8WVxKcHcHe1JXYVNze2Vbc2Fxc1dgen5gSltEeXUAHGJKW31xTXR1U0RTWmNacUlwdGpNfk1EaHFICVRRZgl8HQJWAwkFBwoGTU8fBU1OTXJPZ1xwdnVySHtkXENpdVxfVGJYXFJ1AXh1ZXdzU3VbA3plRERxZgNsYnNYVGZ2RgtVdFkIZWVxVlV1YVBoe11QdmZaR3FjRAxjc3FyZWBgVHF2RHlkdHIMeHFYaVNhckpwdgJXZGRyQ2Z1SAdiawRpeHdIUnV3Y2BzdWILanNhZlB2RHB2YFRUZXddanF3c1diZmJFaHdIV1JxTQNwdmVUDU8DWgNLQEJYER4SXkNUEgkXERgRSFBCEwkWAgBMRlVcTgELR1FeVUxdDF1CEU0=~132kezz` : ``
+    let h5st = ''
+    let h5st_body = {
+        appid: appid,
+        body: body,
+        client: /ip(hone|od)|ipad/i.test($.UA) ? 'apple' : "android",
+        clientVersion: $.UA.split(';')[2],
+        functionId: functionId
+    }
+    if (h5stTool[functionId]) {
+        h5st = await getH5st(h5stTool[functionId], h5st_body)
+    } else {
+        h5st_body.appid = appid
+    }
+    let options = {
+        url: `https://api.m.jd.com/client.action?ext=%7B%22prstate%22%3A%220%22%7D&functionId=${functionId}&appid=${h5st_body.appid}&area=0_0_0_0&osVersion=&networkType=&body=${encodeURIComponent(body)}&client=${h5st_body.client}&clientVersion=${h5st_body.clientVersion}${h5st ? "&h5st=" + h5st : ""}${joyLog}`,
+        headers: {
             'Cookie': $.cookie + $.jda,
-            'user-agent': 'jdapp;iPhone;10.1.2;15.0;ff2caa92a8529e4788a34b3d8d4df66d9573f499;network/wifi;model/iPhone13,4;addressid/2074196292;appBuild/167802;jdSupportDarkMode/1;Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1',
+            'User-Agent': $.UA,
             'Referer': 'https://prodev.m.jd.com/',
-            'origin': 'https://prodev.m.jd.com/',
+            'Origin': 'https://prodev.m.jd.com/',
             'Accept': 'application/json,text/plain,*/*',
             'Accept-Encoding': 'gzip, deflate, br',
             'Accept-Language': 'zh-cn',
@@ -649,6 +698,7 @@ function taskurl_xh(appid, functionId, body = JSON.stringify({})) {
         },
         timeout: 20000
     }
+    return options
 }
 
 async function showMsg() {
@@ -754,7 +804,7 @@ function _jda(format = 'xxxxxxxxxxxxxxxxxxxx') {
 }
 
 async function getUA() {
-    $.UA = `jdapp;iPhone;11.1.4;14.3;${randomString(40)};network/wifi;model/iPhone12,1;addressid/3364463029;appBuild/168210;jdSupportDarkMode/0;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1`
+    $.UA = `jdapp;android;11.3.6;;;M/5.0;appBuild/98527;jdSupportDarkMode/0;ef/1;ep/${encodeURIComponent(JSON.stringify({"hdid":"JM9F1ywUPwflvMIpYPok0tt5k9kW4ArJEU3lfLhxBqw=","ts":1670919987138,"ridx":-1,"cipher":{"sv":"CJS=","ad":"DNPtDzu1EWG0ZNC4YzK5YG==","od":"ZwS3D2SzEQC2YJK0DzVsCK==","ov":"CzO=","ud":"DNPtDzu1EWG0ZNC4YzK5YG=="},"ciphertype":5,"version":"1.2.0","appname":"com.jingdong.app.mall"}))};Mozilla/5.0 (Linux; Android 12; M2011K2C Build/SKQ1.211006.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/89.0.4389.72 MQQBrowser/6.2 TBS/046033 Mobile Safari/537.36`
 }
 
 function randomString(e) {
@@ -778,6 +828,92 @@ const generateRandomInteger = (min, max = 0) => {
 
 function generateArr(start, end) {
     return Array.from(new Array(end + 1).keys()).slice(start)
+}
+
+//log算法
+async function getH5st(appid, h5st_body) {
+    let h5st = ''
+    try {
+        let res = ''
+        let h5st_res = ''
+        h5st_res = await getLog(appid, h5st_body, '')
+        if (h5st_res && typeof h5st_res == 'object' && h5st_res.code == 200 && h5st_res.data && h5st_res.data.h5st) {
+            res = h5st_res.data
+        }
+        if (!res) {
+            console.log(`获取不到算法-${appid}`)
+        } else {
+            if (res.ua) {
+                $.UA = res.ua
+            }
+            h5st = res.h5st || ''
+        }
+    } catch (e) {
+        console.log(e)
+    }
+    return h5st
+}
+
+async function getLog(appid, body, pin) {
+    return new Promise(resolve => {
+        let options = {
+            url: `${$.getSignUrl}/jdh5st`,
+            body: JSON.stringify({ "appid": appid, "pin": pin, "body": body, "token": $.token }),
+            headers: {
+                "Content-Type": "application/json",
+            },
+            timeout: 30000
+        }
+        let msg = ''
+        $.post(options, async (err, resp, data) => {
+            try {
+                if (err) {
+                    console.log(`算法 API请求失败 ${JSON.stringify(err)}`)
+                } else {
+                    data = $.toObj(data, data);
+                    if (data && data.code && data.code == 200) {
+                        msg = data
+                        if (data.msg && data.msg != "success") {
+                            console.log(data.msg)
+                            if (/次数不够/.test(data.msg)) process.exit(1)
+                        }
+                    }
+                }
+            } catch (e) {
+                console.log(e)
+            } finally {
+                resolve(msg);
+            }
+        })
+    })
+}
+
+function toStatus() {
+    return new Promise(resolve => {
+        let options = {
+            url: `${$.getSignUrl}/to_status`,
+            timeout: 30000
+        }
+        $.get(options, async (err, resp, data) => {
+            try {
+                if (err) {
+                    console.log(`${$.toStr(err)}`)
+                    console.log(`${$.name} 连接服务器 API请求失败，请检查网路重试`)
+                } else {
+                    let res = $.toObj(data, data)
+                    if (res && typeof res == 'object') {
+                        if (res.msg === "success") {
+                            $.toStatus = true
+                        }
+                    }
+                }
+            } catch (e) {
+                console.log(e)
+            } finally {
+                resolve()
+            }
+        })
+    })
 }
 
 function Env(name, opts) {
