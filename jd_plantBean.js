@@ -714,7 +714,7 @@ async function collectUserNutr(paradiseUuid) {
 
 async function receiveNutrients() {
     $.receiveNutrientsRes = await request('receiveNutrients', { "roundId": currentRoundId, "monitor_refer": "plant_receiveNutrients" })
-    // console.log(`定时领取营养液结果:${JSON.stringify($.receiveNutrientsRes)}`)
+    console.log(`定时领取营养液结果:${JSON.stringify($.receiveNutrientsRes)}`)
 }
 
 async function plantEggDoLottery() {
