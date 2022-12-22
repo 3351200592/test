@@ -180,7 +180,7 @@ let args_xh = {
 
 
 !(async () => {
-    let token = 'eacgsysoq6tji4g0' // token
+    let token = '' // token
     $.token = process.env.gua_log_token || token // token
     if (!$.token) {
         console.log('请填写 gua_log_token')
